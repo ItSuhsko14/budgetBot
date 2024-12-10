@@ -1,4 +1,5 @@
 import logging
+import os
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from handlers.start_handler import start
 from handlers.message_handler import handle_message
@@ -6,8 +7,20 @@ from handlers.button_handler import button
 from utils.logger import logger
 from data.chat_data import chat_data
 
-# Ваш токен
-TOKEN = '7863397132:AAHAdiMFE1H5jbffiPP0vYcjga6qSUu7C4A'
+def load_env():
+    if os.path.exists(".env"):
+        with open(".env") as f:
+            for line in f:
+                # Ігноруємо коментарі та порожні рядки
+                if line.strip() and not line.startswith("#"):
+                    key, value = line.strip().split("=", 1)
+                    os.environ[key] = value
+
+# Запуск завантаження змінних
+load_env()
+
+# Отримання токена
+TOKEN = os.environ.get("TOKEN")
 
 def main():
     logger.info("Запуск бота...")
