@@ -22,7 +22,7 @@ async def start(update: Update, context: CallbackContext):
 
     keyboard = [
         [KeyboardButton("Додати товар")],
-        [KeyboardButton("Редагувати список")],
+        [KeyboardButton("Видалити товар")],
         [KeyboardButton("Позначити купленими")]
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)

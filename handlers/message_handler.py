@@ -92,7 +92,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
         # Відправляємо оновлений список покупок (які не були видалені і не куплені) внизу чату
         full_list = "\n".join(chat_data[chat_id]['list_items']) if chat_data[chat_id]['list_items'] else "порожній"
-        sent_message = await context.bot.send_message(chat_id, f"Список покупок (актуальний):\n{full_list}")
+        sent_message = await context.bot.send_message(chat_id, f"Список покупокs:\n{full_list}")
         chat_data[chat_id]['list_message_id'] = sent_message.message_id
 
         return
