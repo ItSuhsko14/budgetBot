@@ -67,7 +67,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
         # Оновлюємо повідомлення з купленими товарами
         purchased_list = "\n".join(chat_data[chat_id]['purchased_items']) if chat_data[chat_id]['purchased_items'] else "порожній"
-        text = f"Ви позначили купленими:\n{purchased_list}\nВартість: {cost}"
+        text = f"Куплені товари:\n{purchased_list}\nВартість: {cost}"
 
         if chat_data[chat_id]['purchased_message_id']:
             await context.bot.edit_message_text(
@@ -100,7 +100,7 @@ async def handle_message(update: Update, context: CallbackContext):
     if user_text == "Додати товар":
         await context.bot.send_message(chat_id, "Введіть товар:")
 
-    elif user_text == "Редагувати список":
+    elif user_text == "Видалити товар":
         await cleanup_ephemeral_messages(chat_id, context)
         await make_list_editable(chat_id, context)
 
