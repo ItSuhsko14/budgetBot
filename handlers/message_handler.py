@@ -1,5 +1,3 @@
-# handlers/message_handler.py
-
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
@@ -48,6 +46,9 @@ async def handle_message(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     user_text = update.message.text
 
+    # Додаємо логування повідомлення користувача
+    print(f"Отримано повідомлення від користувача: {user_text}")
+
     if chat_id not in chat_data:
         chat_data[chat_id] = {
             'list_items': [],
@@ -60,12 +61,10 @@ async def handle_message(update: Update, context: CallbackContext):
             'ephemeral_messages': []
         }
 
-    # Якщо очікуємо вартість
     if chat_data[chat_id]['awaiting_cost']:
         cost = user_text
         chat_data[chat_id]['awaiting_cost'] = False
 
-        # Оновлюємо повідомлення з купленими товарами
         purchased_list = "\n".join(chat_data[chat_id]['purchased_items']) if chat_data[chat_id]['purchased_items'] else "порожній"
         text = f"Куплені товари:\n{purchased_list}\nВартість: {cost}"
 
@@ -79,10 +78,8 @@ async def handle_message(update: Update, context: CallbackContext):
             sent = await context.bot.send_message(chat_id, text)
             chat_data[chat_id]['purchased_message_id'] = sent.message_id
 
-        # Після завершення всіх операцій видаляємо всі ефемерні повідомлення
         await cleanup_ephemeral_messages(chat_id, context)
 
-        # Видаляємо старе повідомлення з основним списком покупок, якщо воно було
         if chat_data[chat_id]['list_message_id']:
             try:
                 await context.bot.delete_message(chat_id, chat_data[chat_id]['list_message_id'])
@@ -90,9 +87,8 @@ async def handle_message(update: Update, context: CallbackContext):
                 logger.error(f"Не вдалося видалити старе повідомлення зі списком: {e}")
             chat_data[chat_id]['list_message_id'] = None
 
-        # Відправляємо оновлений список покупок (які не були видалені і не куплені) внизу чату
         full_list = "\n".join(chat_data[chat_id]['list_items']) if chat_data[chat_id]['list_items'] else "порожній"
-        sent_message = await context.bot.send_message(chat_id, f"Список покупокs:\n{full_list}")
+        sent_message = await context.bot.send_message(chat_id, f"Список покупок:\n{full_list}")
         chat_data[chat_id]['list_message_id'] = sent_message.message_id
 
         return
@@ -109,7 +105,6 @@ async def handle_message(update: Update, context: CallbackContext):
         await make_list_purchasable(chat_id, context)
 
     elif 'list_items' in chat_data[chat_id]:
-        # Додаємо новий товар
         chat_data[chat_id]['list_items'].append(user_text)
         logger.info(f"Товар додано у чат {chat_id}: {user_text}")
 
