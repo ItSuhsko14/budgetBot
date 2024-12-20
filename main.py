@@ -3,6 +3,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from handlers.start_handler import start
 from handlers.message_handler import handle_message
 from handlers.button_handler import button
+from data.database import create_tables
 from utils.logger import logger
 
 # Завантаження змінних середовища
@@ -25,6 +26,9 @@ PORT = int(os.getenv("PORT", 8443))
 if __name__ == "__main__":
     try:
         logger.info("Запуск бота...")
+
+        # Створення таблиць у базі даних
+        create_tables()
 
         # Ініціалізація додатку
         application = Application.builder().token(TOKEN).build()
