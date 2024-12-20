@@ -28,6 +28,10 @@ curl -X POST "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPe
 # Test webhook
 curl -X GET "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPeyDyGdH-E/getWebhookInfo"
 
+# Get bot
+curl -X GET "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPeyDyGdH-E/getMe"
+
+
                                                                                                 
 ## Структура даних
 
