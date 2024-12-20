@@ -34,7 +34,7 @@ if __name__ == "__main__":
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
         application.add_handler(CallbackQueryHandler(button))
 
-        logger.info("Бот працює!")
+        logger.info(f"Бот працює на порту {PORT}!")
 
         # Встановлення вебхука
         application.run_webhook(

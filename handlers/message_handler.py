@@ -2,12 +2,18 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
 from utils.logger import logger
+from data.db_service import add_product, get_active_products_by_chat, mark_product_as_deleted
+
 
 async def make_list_editable(chat_id, context):
-    if chat_data[chat_id]['list_items']:
-        keyboard = [[InlineKeyboardButton(item, callback_data=item)] for item in chat_data[chat_id]['list_items']]
+    products = get_active_products_by_chat(chat_id)
+    
+    if products:
+        # Формування клавіатури на основі даних з БД
+        keyboard = [[InlineKeyboardButton(f"{product[1]} ({product[2]})", callback_data=str(product[0]))] for product in products]
         keyboard.append([InlineKeyboardButton("Завершити видалення", callback_data="finish_editing")])
-        full_list = "\n".join(chat_data[chat_id]['list_items'])
+
+        full_list = "\n".join([f"{product[1]} - {product[2]}" for product in products])
         msg = await context.bot.send_message(
             chat_id,
             f"Оберіть товар для видалення:\n\nСписок покупок:\n{full_list}",
@@ -107,6 +113,8 @@ async def handle_message(update: Update, context: CallbackContext):
     elif 'list_items' in chat_data[chat_id]:
         chat_data[chat_id]['list_items'].append(user_text)
         logger.info(f"Товар додано у чат {chat_id}: {user_text}")
+
+        add_product(chat_id, user_text, "Категорія за замовчуванням")
 
         full_list = "\n".join(chat_data[chat_id]['list_items'])
         if chat_data[chat_id]['list_message_id']:
