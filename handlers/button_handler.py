@@ -28,7 +28,7 @@ async def button(update: Update, context: CallbackContext):
         print(f"📦 Отримані товари: {products}")
 
         if products:
-            product_list = "\n".join([f"{product[1]} - {product[2]}" for product in products])
+            product_list = "\n".join([f"{product[1]}" for product in products])
             response_text = f"ТОВАРИ ДЛЯ ПОКУПКИ:\n{product_list}"
         else:
             response_text = "Ваш список товарів порожній."
@@ -121,7 +121,7 @@ async def button(update: Update, context: CallbackContext):
             full_list = "\n".join([f"{product[1]} - {product[2]}" for product in products])
 
             await query.edit_message_text(
-                text=f"Оберіть товар для видалення:\n\nСписок покупок:\n{full_list}",
+                text=f"Оберіть товар для видалення:",
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
         else:

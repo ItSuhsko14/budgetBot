@@ -19,7 +19,7 @@ Keep your token secure and store it safely, it can be used by anyone to control 
 For a description of the Bot API, see this page: https://core.telegram.org/bots/api
 
 # Create webhook
-curl -X POST "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPeyDyGdH-E/setWebhook?url=https://b886-80-92-232-25.ngrok-free.app"
+curl -X POST "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPeyDyGdH-E/setWebhook?url=https://b2c1-80-92-232-25.ngrok-free.app"
 
 
 # Delete webhook
@@ -31,7 +31,7 @@ curl -X GET "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPey
 # Get bot
 curl -X GET "https://api.telegram.org/bot7948478174:AAEzlOM1Dpw_IVXozyIio__5NPeyDyGdH-E/getMe"
 
-
+# create tunel by ngrok
                                                                                                 
 ## Структура даних
 
@@ -63,3 +63,7 @@ CREATE botUser WHITH PASSWORD '123456'
               |        |          |         |       | andriy=CTc/andriy
 
 GRANT ALL PRIVILEGES ON DATABASE budgettestdb TO botUser;
+
+
+# connect to database from terminal
+psql -h localhost -p 5432 -U botuser -d budgettestdb
