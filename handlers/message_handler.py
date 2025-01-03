@@ -21,7 +21,7 @@ async def make_list_editable(chat_id, context):
         full_list = "\n".join([f"{product[1]} - {product[2]}" for product in products])
         msg = await context.bot.send_message(
             chat_id,
-            f"Оберіть товар для видалення:\n\nСписок покупок:\n{full_list}",
+            f"Оберіть товар для видалення:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         chat_data[chat_id]['ephemeral_messages'].append(msg.message_id)
@@ -136,7 +136,7 @@ async def handle_message(update: Update, context: CallbackContext):
         products = get_active_products_by_chat(chat_id)
 
         if products:
-            full_list = "\n".join([f"{product[1]} - {product[2]}" for product in products])
+            full_list = "\n".join([f"{product[1]}" for product in products])
         else:
             full_list = "Список покупок порожній!"
 
