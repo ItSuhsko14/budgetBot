@@ -45,6 +45,24 @@ def get_active_products_by_chat(chat_id):
             cur.close()
             conn.close()
 
+def get_products_by_ids(product_ids):
+    conn = connect_to_database()
+    if conn:
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                SELECT product_id, name, category
+                FROM products
+                WHERE product_id = ANY(%s);
+            """, (list(map(int, product_ids)),))
+            return cur.fetchall()
+        except Exception as e:
+            print(f"❌ Помилка отримання товарів за ID: {e}")
+        finally:
+            cur.close()
+            conn.close()
+    return []
+
 def mark_product_as_deleted(product_id):
     conn = connect_to_database()
     if conn:
