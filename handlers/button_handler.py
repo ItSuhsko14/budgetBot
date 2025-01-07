@@ -7,7 +7,8 @@ from utils.logger import logger
 from handlers.message_handler import cleanup_ephemeral_messages
 from data.db_service import (
     mark_product_as_deleted, 
-    get_active_products_by_chat, 
+    get_active_products_by_chat,
+    get_products_by_ids, 
     mark_product_as_purchased
 )
 
@@ -39,13 +40,25 @@ async def button(update: Update, context: CallbackContext):
         await query.answer()
         return
 
-    # Завершити вибір товарів для покупки
+   # Завершити вибір товарів для покупки
     if item == "finish_purchasing":
         chat_data[chat_id]['purchase_mode'] = False
-        purchased_list = "\n".join(
-            chat_data[chat_id]['purchased_items']
-        ) if chat_data[chat_id]['purchased_items'] else "порожній"
 
+        # IDs куплених товарів
+        purchased_product_ids = set(chat_data[chat_id]['purchased_items'])  # Забираємо ID куплених товарів
+        print(f"IDs куплених товарів: {purchased_product_ids}")
+
+        # Отримуємо товари за їх ID
+        purchased_products = get_products_by_ids(purchased_product_ids)  
+        print(f"📦 Куплені товари: {purchased_products}")
+
+        # Формуємо список назв куплених товарів
+        purchased_names = [product[1] for product in purchased_products]
+
+        # Формуємо текст для списку куплених товарів
+        purchased_list = "\n".join(purchased_names) if purchased_names else "порожній"
+
+        # Формуємо відповідь
         text = f"Ви обрали наступні товари як куплені:\n{purchased_list}\nВведіть вартість цих товарів:"
         await cleanup_ephemeral_messages(chat_id, context)
         sent = await context.bot.send_message(chat_id, text)
@@ -53,6 +66,7 @@ async def button(update: Update, context: CallbackContext):
         chat_data[chat_id]['awaiting_cost'] = True
         await query.answer()
         return
+
 
     # Позначення товару як купленого
     if chat_data[chat_id]['purchase_mode']:
@@ -85,7 +99,7 @@ async def button(update: Update, context: CallbackContext):
 
                 # Оновлення повідомлення з товарами
                 await query.edit_message_text(
-                    text=f"Оберіть товари для позначення купленими:\n\nСписок покупок:\n{full_list}",
+                    text=f"Оберіть товари для позначення купленими:\n\n",
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
             else:
@@ -114,11 +128,11 @@ async def button(update: Update, context: CallbackContext):
         products = get_active_products_by_chat(chat_id)
         if products:
             keyboard = [
-                [InlineKeyboardButton(f"{product[1]} ({product[2]})", callback_data=str(product[0]))]
+                [InlineKeyboardButton(f"{product[1]})", callback_data=str(product[0]))]
                 for product in products
             ]
             keyboard.append([InlineKeyboardButton("Завершити видалення", callback_data="finish_editing")])
-            full_list = "\n".join([f"{product[1]} - {product[2]}" for product in products])
+            full_list = "\n".join([f"{product[1]}" for product in products])
 
             await query.edit_message_text(
                 text=f"Оберіть товар для видалення:",
