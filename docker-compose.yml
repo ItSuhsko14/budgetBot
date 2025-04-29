@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  budgetbot:
+    build: .
+    container_name: budgetbot
+    restart: always
+    env_file: .env
+    network_mode: host # Щоб база на хості була доступна
