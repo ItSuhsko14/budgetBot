@@ -2,3 +2,4 @@ python-telegram-bot[webhooks]==21.8
 flask
 gunicorn
 python-dotenv
+psycopg2-binary
