@@ -45,6 +45,7 @@ if __name__ == "__main__":
             listen="0.0.0.0",
             port=PORT,
             webhook_url=WEBHOOK_URL,
+            webhook_path="/webhook"
         )
     except Exception as e:
         logger.error(f"Помилка запуску: {e}")
