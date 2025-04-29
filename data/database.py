@@ -66,7 +66,7 @@ def add_expense(amount, category, product_ids, chat_id):
                 INSERT INTO expenses (amount, category, product_ids, chat_id)
                 VALUES (%s, %s, %s, %s)
                 RETURNING expense_id;
-            """, (amount, category, product_ids, chat_id))
+            """, (amount, category, [int(pid) for pid in product_ids], chat_id))
             expense_id = cur.fetchone()[0]
             conn.commit()
             print(f"✅ Витрата з ID {expense_id} додана.")

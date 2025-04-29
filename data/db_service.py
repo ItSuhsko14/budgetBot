@@ -81,25 +81,25 @@ def mark_product_as_deleted(product_id):
             cur.close()
             conn.close()
 
-def add_expense(chat_id, amount, category, product_ids):
+def add_expense(amount, category, product_ids, chat_id):
     """
     Додає витрату в таблицю expenses.
 
     Аргументи:
-    chat_id - ID чату
     amount - Сума витрати
     category - Категорія витрати
     product_ids - Список ID товарів
+    chat_id - ID чату
     """
     conn = connect_to_database()
     if conn:
         cur = conn.cursor()
         try:
             cur.execute("""
-                INSERT INTO expenses (chat_id, amount, category, product_ids)
+                INSERT INTO expenses (amount, category, product_ids, chat_id)
                 VALUES (%s, %s, %s, %s)
                 RETURNING expense_id, expense_date;
-            """, (chat_id, amount, category, product_ids))
+            """, (amount, category, [int(pid) for pid in product_ids], chat_id))
             
             result = cur.fetchone()
             if result:

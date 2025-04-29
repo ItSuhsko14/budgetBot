@@ -87,7 +87,7 @@ async def handle_message(update: Update, context: CallbackContext):
             category = "Покупки"
 
             # Додавання витрати в базу даних
-            add_expense(cost, category, list(product_ids), chat_id)
+            add_expense(amount=cost, category=category, product_ids=list(product_ids), chat_id=chat_id)
 
             # Отримання назв товарів з бази даних за ID
             purchased_products = get_products_by_ids(product_ids)
@@ -114,9 +114,11 @@ async def handle_message(update: Update, context: CallbackContext):
             # Очищення після завершення купівлі
             chat_data[chat_id]['awaiting_cost'] = False
             chat_data[chat_id]['purchased_items'].clear()
+            return
 
         except ValueError:
             await context.bot.send_message(chat_id, "Введіть правильну числову суму.")
+            return
 
     if user_text == "Додати товар":
         if chat_data[chat_id].get('prompt_message_id'):
