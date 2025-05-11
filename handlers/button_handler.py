@@ -128,7 +128,7 @@ async def button(update: Update, context: CallbackContext):
         products = get_active_products_by_chat(chat_id)
         if products:
             keyboard = [
-                [InlineKeyboardButton(f"{product[1]})", callback_data=str(product[0]))]
+                [InlineKeyboardButton(f"{product[1]}", callback_data=str(product[0]))]
                 for product in products
             ]
             keyboard.append([InlineKeyboardButton("Завершити видалення", callback_data="finish_editing")])
