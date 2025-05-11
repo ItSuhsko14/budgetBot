@@ -56,3 +56,4 @@ curl -X GET "https://api.telegram.org/bot<BOT_TOKEN>/getMe"
 
 # connect to database from terminal
 psql -h localhost -p 5432 -U botuser -d budgettestdb
+1
