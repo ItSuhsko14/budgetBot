@@ -1,13 +1,23 @@
 import os
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    ContextTypes,
+    filters,
+)
+from telegram.error import TelegramError
+
 from handlers.start_handler import start
 from handlers.message_handler import handle_message
 from handlers.button_handler import button
 from data.database import create_tables
 from utils.logger import logger
 
-# Завантаження змінних середовища
+
 def load_env():
+    """Завантаження змінних середовища з .env"""
     if os.path.exists(".env"):
         with open(".env") as f:
             for line in f:
@@ -15,36 +25,48 @@ def load_env():
                     key, value = line.strip().split("=", 1)
                     os.environ[key] = value
 
-# Завантаження змінних
+
+async def error_handler(update, context: ContextTypes.DEFAULT_TYPE):
+    """Глобальний обробник винятків"""
+    logger.error("❌ Виникла помилка в обробці оновлення:", exc_info=context.error)
+
+    # Повідомлення користувачу (опціонально, якщо хочеш зворотній зв'язок)
+    try:
+        if update and update.effective_message:
+            await update.effective_message.reply_text("⚠️ Виникла технічна помилка. Ми вже над цим працюємо.")
+    except TelegramError:
+        pass  # Не можемо навіть відповісти користувачу
+
+
+# --- Запуск ---
 load_env()
 
-# Конфігурація
 TOKEN = os.getenv("TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 PORT = int(os.getenv("PORT", 8443))
 
 if __name__ == "__main__":
     try:
-        logger.info("Запуск бота...")
+        logger.info("🚀 Запуск бота...")
 
-        # Створення таблиць у базі даних
         create_tables()
 
-        # Ініціалізація додатку
         application = Application.builder().token(TOKEN).build()
 
-        # Додавання обробників
+        # Обробники
         application.add_handler(CommandHandler("start", start))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
         application.add_handler(CallbackQueryHandler(button))
 
-        logger.info(f"Бот працює на порту {PORT}!")
+        # Обробник помилок
+        application.add_error_handler(error_handler)
 
-        # Встановлення вебхука
+        logger.info(f"🌐 Бот працює на порту {PORT}")
         application.run_webhook(
             listen="0.0.0.0",
             port=PORT,
             webhook_url=WEBHOOK_URL,
         )
+
     except Exception as e:
-        logger.error(f"Помилка запуску: {e}")
+        logger.error(f"❌ Помилка запуску: {e}", exc_info=True)
