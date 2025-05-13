@@ -1,3 +1,63 @@
+Telegram бот для ведення списку покупок з інтеграцією в PostgreSQL та розгортанням через Docker.
+
+---
+
+### ♻Установка
+
+1. Клонувати репозиторій:
+
+```bash
+git clone https://github.com/ItSuhsko14/budgetBot.git
+cd budgetBot
+```
+
+2. Створити `.env` файл на основі прикладу:
+
+```bash
+cp .env.example .env
+```
+
+3. Встановити потрібні змінні середовища в `.env`
+
+---
+
+### 🚀Розгортання (Dev)
+
+#### За допомогою ngrok:
+
+1. Встановити [ngrok](https://ngrok.com/)
+2. Запустити тунель:
+
+```bash
+ngrok http 8443
+```
+
+3. Взяти URL і оновити `WEBHOOK_URL` в `.env`
+
+```env
+WEBHOOK_URL=https://<your-ngrok-subdomain>.ngrok.io/webhook
+```
+
+4. Запустити локально:
+
+```bash
+python main.py
+```
+
+Або використовувати dev-скрипт:
+
+```bash
+bash start_dev.sh
+```
+
+---
+
+### 🚫 Production через GitHub Actions
+
+Застосунок буде автоматично оновлюватись на Raspberry Pi через self-hosted GitHub runner. Необхідно лише налаштувати Secrets.
+
+
+
 # Webhook setting
 https://api.telegram.org/bot<BOT_TOKEN>/setWebhook?url=https://budgetbot-eavg.onrender.com
 
