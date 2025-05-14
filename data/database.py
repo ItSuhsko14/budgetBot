@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import sys
+import time  
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.env_loader import load_env
@@ -10,14 +11,20 @@ load_env()
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 # Підключення до бази даних
-def connect_to_database():
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        print("✅ Підключення успішне!")
-        return conn
-    except Exception as e:
-        print(f"❌ Помилка підключення: {e}")
-        return None
+def connect_to_database(retries=5, delay=2):
+    for attempt in range(1, retries + 1):
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            print(f"✅ Підключення успішне (спроба {attempt})")
+            return conn
+        except Exception as e:
+            print(f"❌ Спроба {attempt} не вдалася: {e}")
+            if attempt < retries:
+                print(f"⏳ Очікування {delay} секунд перед наступною спробою...")
+                time.sleep(delay)
+            else:
+                print("🔴 Вичерпано всі спроби підключення до бази даних.")
+    return None
 
 # Створення таблиць
 def create_tables():
