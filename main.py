@@ -53,12 +53,12 @@ if __name__ == "__main__":
 
         application = Application.builder().token(TOKEN).build()
 
-        # Обробники
+        # Handlers
         application.add_handler(CommandHandler("start", start))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
         application.add_handler(CallbackQueryHandler(button))
 
-        # Обробник помилок
+        # Error handler
         application.add_error_handler(error_handler)
 
         logger.info(f"🌐 Бот працює на порту {PORT}")

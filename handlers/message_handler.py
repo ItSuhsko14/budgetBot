@@ -10,13 +10,15 @@ from data.db_service import (
     mark_product_as_purchased, 
     add_expense
 )
+from utils.initialize_chat import initialize_chat
+from button.delete_mode import create_delete_keyboard
 
 
 async def make_list_editable(chat_id, context):
     products = get_active_products_by_chat(chat_id)
 
     if products:
-        keyboard = [[InlineKeyboardButton(f"{product[1]}", callback_data=str(product[0]))] for product in products]
+        keyboard = [[InlineKeyboardButton(f"{product[1]}", callback_data=f"mark_delete:{product[0]}")] for product in products]
         keyboard.append([InlineKeyboardButton("Завершити видалення", callback_data="finish_editing")])
 
         full_list = "\n".join([f"{product[1]}" for product in products])
@@ -68,17 +70,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
     print(f"Отримано повідомлення від користувача: {user_text}")
 
-    if chat_id not in chat_data:
-        chat_data[chat_id] = {
-            'list_items': [],
-            'removed_items': [],
-            'purchased_items': [],
-            'list_message_id': None,
-            'purchase_mode': False,
-            'awaiting_cost': False,
-            'purchased_message_id': None,
-            'ephemeral_messages': []
-        }
+    initialize_chat(chat_id)
 
     if chat_data[chat_id]['awaiting_cost']:
         try:
@@ -134,7 +126,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
     elif user_text == "Видалити товар":
         await cleanup_ephemeral_messages(chat_id, context)
-        await make_list_editable(chat_id, context)
+        await create_delete_keyboard(chat_id, context)
 
     elif user_text == "Позначити купленими":
         await cleanup_ephemeral_messages(chat_id, context)
