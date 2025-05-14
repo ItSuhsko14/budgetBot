@@ -21,7 +21,7 @@ async def handle_delete_product(update: Update, context: CallbackContext):
         unmark_for_deletion(chat_id, product_id)
 
     # Оновити клавіатуру
-    await update_delete_keyboard(chat_id)
+    await update_delete_keyboard(chat_id, context)
 
 def mark_for_deletion(chat_id, product_id):
     if product_id not in chat_data[chat_id]['removed_items']:
@@ -70,7 +70,7 @@ async def create_delete_keyboard(chat_id, context):
     sent = await context.bot.send_message(chat_id, "Оберіть товар для видалення:", reply_markup=keyboard)
     chat_data[chat_id]['delete_message_id'] = sent.message_id
 
-async def update_delete_keyboard(chat_id):
+async def update_delete_keyboard(chat_id, context):
     keyboard = build_delete_keyboard(chat_id)
 
     await context.bot.edit_message_reply_markup(chat_id=chat_id, message_id=chat_data[chat_id]['delete_message_id'], reply_markup=keyboard)
