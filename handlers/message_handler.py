@@ -12,6 +12,7 @@ from data.db_service import (
 )
 from utils.initialize_chat import initialize_chat
 from button.delete_mode import create_delete_keyboard
+from button.purchase_mode import create_purchasing_keyboard
 
 
 async def make_list_editable(chat_id, context):
@@ -130,7 +131,11 @@ async def handle_message(update: Update, context: CallbackContext):
 
     elif user_text == "Позначити купленими":
         await cleanup_ephemeral_messages(chat_id, context)
-        await make_list_purchasable(chat_id, context)
+        await create_purchasing_keyboard(chat_id, context)
+
+    # elif user_text == "Позначити купленими":
+    #     await cleanup_ephemeral_messages(chat_id, context)
+    #     await make_list_purchasable(chat_id, context)
 
     elif 'list_items' in chat_data[chat_id]:
         chat_data[chat_id]['list_items'].append(user_text)

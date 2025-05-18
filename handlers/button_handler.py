@@ -4,13 +4,13 @@ from data.chat_data import chat_data
 from utils.logger import logger
 from handlers.message_handler import cleanup_ephemeral_messages
 from button.delete_mode import handle_delete_product, finish_deleting
-from button.purchase_mode import finalize_purchasing, mark_purchased
+from button.purchase_mode import finalize_purchasing, handle_purchasing
 from button.edit_mode import finalize_editing
 from utils.initialize_chat import initialize_chat
 
 
 async def button(update: Update, context: CallbackContext):
-    print("✅ Натиснуто кнопку")
+    print("✅ Натиснуто кнопку", update.callback_query.data)
     query = update.callback_query
     chat_id = query.message.chat_id
     item = query.data
@@ -38,6 +38,10 @@ async def button(update: Update, context: CallbackContext):
 
     if action == "finish_deleting":
         await finish_deleting(update, context)
+        return
+
+    if action == "mark_purchased":
+        await handle_purchasing(update, context)
         return
 
     if chat_data[chat_id]['purchase_mode']:
