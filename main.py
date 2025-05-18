@@ -28,7 +28,7 @@ def load_env():
 
 async def error_handler(update, context: ContextTypes.DEFAULT_TYPE):
     """Глобальний обробник винятків"""
-    logger.error("❌ Виникла помилка в обробці оновлення:", exc_info=context.error)
+    logger.error("❌ Виникла помилка в обробці оновлення", exc_info=True)
 
     # Повідомлення користувачу (опціонально, якщо хочеш зворотній зв'язок)
     try:
@@ -68,5 +68,5 @@ if __name__ == "__main__":
             webhook_url=WEBHOOK_URL,
         )
 
-    except Exception as e:
-        logger.error(f"❌ Помилка запуску: {e}", exc_info=True)
+    except Exception:
+        logger.error("❌ Помилка запуску", exc_info=True)
