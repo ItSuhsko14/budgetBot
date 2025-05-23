@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
-from utils.logger import logger
+from utils.logger import log
 from data.db_service import (
     add_product, 
     get_active_products_by_chat,
@@ -61,7 +61,7 @@ async def cleanup_ephemeral_messages(chat_id, context: CallbackContext):
         try:
             await context.bot.delete_message(chat_id, msg_id)
         except Exception as e:
-            logger.error(f"Не вдалося видалити повідомлення {msg_id}: {e}")
+            log(f"Не вдалося видалити повідомлення {msg_id}: {e}")
     chat_data[chat_id]['ephemeral_messages'] = []
 
 
@@ -99,7 +99,7 @@ async def handle_message(update: Update, context: CallbackContext):
                         text=text
                     )
                 except Exception as e:
-                    logger.error(f"Не вдалося оновити повідомлення: {e}")
+                    log(f"Не вдалося оновити повідомлення: {e}")
             else:
                 sent = await context.bot.send_message(chat_id, text)
                 chat_data[chat_id]['purchased_message_id'] = sent.message_id
@@ -118,7 +118,7 @@ async def handle_message(update: Update, context: CallbackContext):
             try:
                 await context.bot.delete_message(chat_id=chat_id, message_id=chat_data[chat_id]['prompt_message_id'])
             except Exception as e:
-                logger.error(f"Не вдалося видалити повідомлення 'Введіть товар': {e}")
+                log(f"Не вдалося видалити повідомлення 'Введіть товар': {e}")
 
         # Створюємо нове повідомлення "Введіть товар"
         sent_message = await context.bot.send_message(chat_id, "Введіть товар:")
@@ -139,7 +139,7 @@ async def handle_message(update: Update, context: CallbackContext):
 
     elif 'list_items' in chat_data[chat_id]:
         chat_data[chat_id]['list_items'].append(user_text)
-        logger.info(f"Товар додано у чат {chat_id}: {user_text}")
+        log(f"Товар додано у чат {chat_id}: {user_text}")
 
         # Додаємо товар у базу даних
         add_product(chat_id, user_text, "Категорія за замовчуванням")
@@ -157,7 +157,7 @@ async def handle_message(update: Update, context: CallbackContext):
             try:
                 await context.bot.delete_message(chat_id=chat_id, message_id=chat_data[chat_id]['list_message_id'])
             except Exception as e:
-                logger.error(f"Не вдалося видалити повідомлення: {e}")
+                log(f"Не вдалося видалити повідомлення: {e}")
 
         # Створюємо нове повідомлення зі списком товарів
         sent_message = await context.bot.send_message(chat_id, f"ТОВАРИ ДЛЯ ПОКУПКИ:\n{full_list}")
@@ -168,7 +168,7 @@ async def handle_message(update: Update, context: CallbackContext):
             try:
                 await context.bot.delete_message(chat_id=chat_id, message_id=chat_data[chat_id]['prompt_message_id'])
             except Exception as e:
-                logger.error(f"Не вдалося видалити повідомлення 'Введіть товар': {e}")
+                log(f"Не вдалося видалити повідомлення 'Введіть товар': {e}")
 
         # Створюємо нове повідомлення "Введіть товар"
         new_prompt_message = await context.bot.send_message(chat_id, "Введіть товар:")

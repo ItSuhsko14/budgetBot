@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
-from utils.logger import logger
+from utils.logger import log
 from handlers.message_handler import cleanup_ephemeral_messages
 from button.delete_mode import handle_delete_product, finish_deleting
 from button.purchase_mode import finalize_purchasing, handle_purchasing

@@ -2,7 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
 from data.db_service import mark_product_as_deleted
 from data.db_service import get_active_products_by_chat
-from utils.logger import logger
+from utils.logger import log
 from data.chat_data import chat_data
 
 
@@ -83,7 +83,7 @@ async def finish_deleting(update: Update, context: CallbackContext):
     removed_ids = chat_data[chat_id].get('removed_items', [])
     if removed_ids:
         for product_id in removed_ids:
-            logger.info(f"✅ Товар з ID {product_id} позначено як 'deleted'.")
+            log(f"✅ Товар з ID {product_id} позначено як 'deleted'.")
             mark_product_as_deleted(product_id)
         chat_data[chat_id]['removed_items'] = []
 
@@ -94,7 +94,7 @@ async def finish_deleting(update: Update, context: CallbackContext):
             await context.bot.delete_message(chat_id, message_id)
             chat_data[chat_id].pop('delete_message_id', None)
     except Exception as e:
-        logger.warning(f"⚠️ Не вдалося видалити повідомлення: {e}")
+        log(f"⚠️ Не вдалося видалити повідомлення: {e}")
 
     # 📋 Вивід нового списку товарів
     products = get_active_products_by_chat(chat_id)

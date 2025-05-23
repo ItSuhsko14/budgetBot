@@ -5,7 +5,7 @@ from telegram.ext import CallbackContext
 from data.chat_data import chat_data
 from data.db_service import get_products_by_ids, get_active_products_by_chat, mark_product_as_purchased
 # from handlers.message_handler import cleanup_ephemeral_messages
-from utils.logger import logger
+from utils.logger import log
 
 async def handle_purchasing(update: Update, context: CallbackContext):
     query = update.callback_query
@@ -36,7 +36,7 @@ async def update_purchasing_keyboard(chat_id, context):
             reply_markup=keyboard
         )
     except Exception as e:
-        logger.error(f"Помилка при оновленні клавіатури: {str(e)}")
+        log(f"Помилка при оновленні клавіатури: {str(e)}")
 
 async def create_purchasing_keyboard(chat_id, context):
     print("✅ Створюємо клавіатуру для вибору товарів") 
@@ -67,6 +67,7 @@ def build_purchasing_keyboard(chat_id):
     keyboard.append([
         InlineKeyboardButton("✅ Завершити покупку", callback_data="finish_purchasing")
     ])
+    
 
     return InlineKeyboardMarkup(keyboard)
 
