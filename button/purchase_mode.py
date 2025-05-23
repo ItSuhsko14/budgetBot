@@ -5,7 +5,7 @@ from telegram.ext import CallbackContext
 from data.chat_data import chat_data
 from data.db_service import get_products_by_ids, get_active_products_by_chat, mark_product_as_purchased
 from handlers.message_handler import cleanup_ephemeral_messages
-from utils.logger import logger
+from utils.logger import log
 
 
 async def finalize_purchasing(update, context: CallbackContext):
@@ -34,7 +34,7 @@ async def mark_purchased(update, context: CallbackContext):
     try:
         product_id = int(item)
         mark_product_as_purchased(product_id)
-        logger.info(f"✅ Товар з ID {product_id} позначено як 'purchased'.")
+        log(f"✅ Товар з ID {product_id} позначено як 'purchased'.")
 
         chat_data[chat_id]['list_items'] = [
             i for i in chat_data[chat_id]['list_items'] if str(i) != str(product_id)
@@ -60,6 +60,6 @@ async def mark_purchased(update, context: CallbackContext):
             )
 
     except ValueError:
-        logger.error(f"❌ Неправильний формат ID товару: {item}")
+        log(f"❌ Неправильний формат ID товару: {item}")
 
     await query.answer()

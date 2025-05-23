@@ -6,15 +6,18 @@ class BudgetFormatter(logging.Formatter):
         record.msg = f"[budget] {record.msg}"
         return super().format(record)
 
-def setup_logger():
+def setup_budget_logger():
     handler = logging.StreamHandler(sys.stdout)
     formatter = BudgetFormatter('%(asctime)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
 
-    logger = logging.getLogger()
+    logger = logging.getLogger("budget")
     logger.setLevel(logging.INFO)
-    logger.handlers = [handler]  # Очистити попередні хендлери і додати один
+    logger.handlers = [handler]
+    logger.propagate = False  # Важливо: щоб не дублювати в root
 
     return logger
 
-logger = setup_logger()
+# Ініціалізуємо логер і створюємо зручне імʼя log
+_log = setup_budget_logger()
+log = _log.info  # Тепер просто log("повідомлення")

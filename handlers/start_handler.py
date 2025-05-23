@@ -1,10 +1,10 @@
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
-from utils.logger import logger
+from utils.logger import log
 
 async def start(update: Update, context: CallbackContext):
-    logger.info(f"/start від {update.message.from_user.username} у чаті {update.effective_chat.id}")
+    log(f"/start від {update.message.from_user.username} у чаті {update.effective_chat.id}")
     chat_id = update.effective_chat.id
 
     # Перевіряємо чи існує запис для цього чату, якщо ні — створюємо
