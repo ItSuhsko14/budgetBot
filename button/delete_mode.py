@@ -15,6 +15,7 @@ async def handle_delete_product(update: Update, context: CallbackContext):
     # Ініціалізуємо список видалених товарів, якщо він ще не існує
     removed = chat_data[chat_id].setdefault('removed_items', [])
 
+    #Міняємо статус товара помітити на видалення | не помітити на видалення
     if action == "mark_delete":
         mark_for_deletion(chat_id, product_id)
     elif action == "unmark_delete":
