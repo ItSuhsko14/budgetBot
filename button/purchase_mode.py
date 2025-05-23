@@ -3,7 +3,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
-from data.db_service import get_products_by_ids, get_active_products_by_chat, mark_product_as_purchased
+from data.db_service import get_active_products_by_chat, add_expense
 # from handlers.message_handler import cleanup_ephemeral_messages
 from utils.logger import log
 
@@ -21,7 +21,7 @@ async def handle_purchasing(update: Update, context: CallbackContext):
     if action == "mark_purchased":
         await mark_purchased(chat_id, product_id)
     elif action == "unmark_purchased":
-        await unmark_purchased(chat_data[chat_id], product_id)
+        await unmark_purchased(chat_id, product_id)
 
     # Оновити клавіатуру
     await update_purchasing_keyboard(chat_id, context)
@@ -68,46 +68,27 @@ def build_purchasing_keyboard(chat_id):
         InlineKeyboardButton("✅ Завершити покупку", callback_data="finish_purchasing")
     ])
     
-
     return InlineKeyboardMarkup(keyboard)
-
-    keyboard = []
-
-    for product in products:
-        product_id = str(product[0])
-        product_name = product[1]
-
-        if product_id in marked_ids:
-            keyboard.append([
-                InlineKeyboardButton(f"✅ {product_name}", callback_data=f"unmark_purchased:{product_id}")
-            ])
-        else:
-            keyboard.append([
-                InlineKeyboardButton(product_name, callback_data=f"mark_purchased:{product_id}")
-            ])
-
-    keyboard.append([
-        InlineKeyboardButton("✅ Завершити покупку", callback_data="finish_purchasing")
-    ])
-
-    return InlineKeyboardMarkup(keyboard)
-
-
-async def finalize_purchasing(update: Update, context: CallbackContext):
-    # взяти список виділених товарів
-    # вивести повідомлення про очікування суми
-    # якщо сумма введена - викликати add_expense
-    print("finilize_purchasing")
 
 async def mark_purchased(chat_id: int, product_id: str):
     if product_id not in chat_data[chat_id]['purchased_items']:
         chat_data[chat_id]['purchased_items'].append(product_id)
     print(f"✅ Позначено товар {product_id} як куплений")
 
-async def unmark_purchased(chat_data, product_id):
-    if product_id in chat_data['purchased_items']:
-        chat_data['purchased_items'].remove(product_id)
+async def unmark_purchased(chat_id: int, product_id: str):
+    if 'purchased_items' in chat_data[chat_id] and product_id in chat_data[chat_id]['purchased_items']:
+        chat_data[chat_id]['purchased_items'].remove(product_id)
     print(f"✅ Знято позначку з товару {product_id}")
+
+async def finalize_purchasing(update: Update, context: CallbackContext):
+    query = update.callback_query
+    chat_id = query.message.chat_id
+    chat_data[chat_id]['awaiting_cost'] = True
+    purchased_products = chat_data[chat_id]['purchased_items']
+    print("✅ Список куплених товарів:", purchased_products)
+    await context.bot.send_message(chat_id, "Введіть вартість обраних товарів:")
+    print("finilize_purchasing")
+
 
 #     chat_data[chat_id]['purchase_mode'] = False
 #     purchased_product_ids = set(chat_data[chat_id]['purchased_items'])

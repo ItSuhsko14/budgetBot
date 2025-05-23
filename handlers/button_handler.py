@@ -24,10 +24,6 @@ async def button(update: Update, context: CallbackContext):
         await finalize_editing(update, context)
         return
 
-    if action == "finish_purchasing":
-        await finalize_purchasing(update, context)
-        return
-
     if action == "mark_delete":
         await handle_delete_product(update, context)
         return
@@ -42,6 +38,14 @@ async def button(update: Update, context: CallbackContext):
 
     if action == "mark_purchased":
         await handle_purchasing(update, context)
+        return
+    
+    if action == "unmark_purchased":
+        await handle_purchasing(update, context)
+        return
+
+    if action == "finish_purchasing":
+        await finalize_purchasing(update, context)
         return
 
     if chat_data[chat_id]['purchase_mode']:

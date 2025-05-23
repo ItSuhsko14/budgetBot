@@ -22,3 +22,15 @@ chat_data = {}
 #   'awaiting_cost': False,
 #   'purchased_message_id': None
 # }
+
+# отримати список активних товарів
+def get_active_products(chat_id):
+    return chat_data[chat_id]['list_items']
+    
+# отримати список помічених на видалення
+def get_marked_for_deletion(chat_id):
+    return chat_data[chat_id]['removed_items']
+    
+# отримати список помічених на купівлю
+def get_marked_for_purchase(chat_id):
+    return chat_data[chat_id]['purchased_items']

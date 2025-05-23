@@ -13,6 +13,7 @@ from data.db_service import (
 from utils.initialize_chat import initialize_chat
 from button.delete_mode import create_delete_keyboard
 from button.purchase_mode import create_purchasing_keyboard
+from helpers.product_list import send_active_products_message
 
 
 async def make_list_editable(chat_id, context):
@@ -81,13 +82,15 @@ async def handle_message(update: Update, context: CallbackContext):
 
             # Додавання витрати в базу даних
             add_expense(amount=cost, category=category, product_ids=list(product_ids), chat_id=chat_id)
+            for product_id in product_ids:
+                mark_product_as_deleted(product_id)
 
             # Отримання назв товарів з бази даних за ID
             purchased_products = get_products_by_ids(product_ids)
             purchased_names = [product[1] for product in purchased_products if product[1]]
 
             # Формування списку куплених товарів
-            purchased_list = "\n".join(purchased_names) if purchased_names else "порожній"
+            purchased_list = "\n - ".join(purchased_names) if purchased_names else "порожній"
             text = f"Куплені товари:\n{purchased_list}\nВартість: {cost:.2f}"
 
             # Оновлення або створення повідомлення
@@ -107,6 +110,10 @@ async def handle_message(update: Update, context: CallbackContext):
             # Очищення після завершення купівлі
             chat_data[chat_id]['awaiting_cost'] = False
             chat_data[chat_id]['purchased_items'].clear()
+            
+            # Отримуємо та виводимо список всіх активних товарів
+            await send_active_products_message(chat_id, context)
+                
             return
 
         except ValueError:
