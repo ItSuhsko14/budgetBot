@@ -50,6 +50,7 @@ python main.py
 bash start_dev.sh
 ```
 
+
 ---
 
 ### 🚫 Production через GitHub Actions
