@@ -6,6 +6,7 @@ chat_data = {}
 #   'list_items': [...],
 #   'removed_items': [...],  # Якщо використовували раніше для видалених товарів
 #   'purchased_items': [],   # Додаємо для куплених товарів
+#   'selected_items': [],    # Додаємо для вибраних товарів
 #   'list_message_id': None,
 #   'purchase_mode': False,  # Режим позначення куплених
 #   'awaiting_cost': False,  # Очікування вводу вартості
@@ -34,3 +35,6 @@ def get_marked_for_deletion(chat_id):
 # отримати список помічених на купівлю
 def get_marked_for_purchase(chat_id):
     return chat_data[chat_id]['purchased_items']
+
+def get_selected_products(chat_id):
+    return chat_data[chat_id]['selected_items']
