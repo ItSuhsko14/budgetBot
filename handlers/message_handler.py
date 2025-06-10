@@ -26,15 +26,6 @@ async def prompt_add_product(chat_id, context):
     chat_data[chat_id]['prompt_message_id'] = sent_message.message_id
 
 
-async def cleanup_ephemeral_messages(chat_id, context: CallbackContext):
-    for msg_id in chat_data[chat_id]['ephemeral_messages']:
-        try:
-            await context.bot.delete_message(chat_id, msg_id)
-        except Exception as e:
-            log(f"Не вдалося видалити повідомлення {msg_id}: {e}")
-    chat_data[chat_id]['ephemeral_messages'] = []
-
-
 async def handle_message(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     user_text = update.message.text
@@ -59,7 +50,7 @@ async def handle_message(update: Update, context: CallbackContext):
             purchased_names = [product[1] for product in purchased_products if product[1]]
 
             # Формування списку куплених товарів
-            purchased_list = "\n - ".join(purchased_names) if purchased_names else "порожній"
+            purchased_list = "\n • ".join(purchased_names) if purchased_names else "порожній"
             text = f"Куплені товари:\n • {purchased_list}\nВартість: {cost:.2f}"
 
             # Оновлення або створення повідомлення
