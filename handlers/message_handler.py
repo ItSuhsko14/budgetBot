@@ -11,6 +11,7 @@ from data.db_service import (
 )
 from utils.initialize_chat import initialize_chat
 from utils.keyboard import delete_keyboard, create_keyboard
+from utils.product_text_handler import split_text_to_items
 
 
 async def prompt_add_product(chat_id, context):
@@ -81,15 +82,20 @@ async def handle_message(update: Update, context: CallbackContext):
             return
 
     elif 'list_items' in chat_data[chat_id]:
-        chat_data[chat_id]['list_items'].append(user_text)
-        log(f"Товар додано у чат {chat_id}: {user_text}")
+        def product_handler(user_text):    
+            chat_data[chat_id]['list_items'].append(user_text)
+            log(f"Товар додано у чат {chat_id}: {user_text}")
 
-        # Додаємо товар у базу даних
-        add_product(chat_id, user_text, "Категорія за замовчуванням")
+            # Додаємо товар у базу даних
+            add_product(chat_id, user_text, "Категорія за замовчуванням")
 
-        # Отримуємо всі активні товари з бази
-        products = get_active_products_by_chat(chat_id)
-        chat_data[chat_id]['list_items'] = products
+            # Отримуємо всі активні товари з бази
+            products = get_active_products_by_chat(chat_id)
+            chat_data[chat_id]['list_items'] = products
+
+        products_list = split_text_to_items(user_text)
+        for product in products_list:
+            product_handler(product)
 
         await delete_keyboard(chat_id, context)
         await create_keyboard(chat_id, update, context)
