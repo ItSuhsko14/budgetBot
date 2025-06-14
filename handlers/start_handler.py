@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
 from utils.logger import log
-from utils.keyboard import create_keyboard
+from utils.keyboard import create_keyboard, remove_keyboard
 from data.db_service import get_active_products_by_chat
 
 
@@ -30,6 +30,6 @@ async def start(update: Update, context: CallbackContext):
 
     # Зберігаємо в локальний стейт
     chat_data[chat_id]['list_items'] = products
-
+    await remove_keyboard(update, context)
     await create_keyboard(chat_id, update)
     

@@ -1,6 +1,8 @@
 from utils.logger import log
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from data.chat_data import chat_data
+from telegram import ReplyKeyboardRemove
+from telegram.ext import ContextTypes
 
 async def create_keyboard_keys(chat_id):
     products = chat_data[chat_id]['list_items']
@@ -21,7 +23,9 @@ async def create_keyboard_keys(chat_id):
         [separator],
         [InlineKeyboardButton("➕ Додати товар", callback_data="add_product")],
         [InlineKeyboardButton("❌ Видалити товар", callback_data="finish_deleting")],
-        [InlineKeyboardButton("✅ Позначити купленими", callback_data="finish_purchasing")]
+        [InlineKeyboardButton("✅ Позначити купленими", callback_data="finish_purchasing")],
+        # [InlineKeyboardButton("✅ Додати категорію", callback_data="add_category")],
+        # [InlineKeyboardButton("❌ Видалити категорію", callback_data="finish_purchasing")]
     ]
 
     return InlineKeyboardMarkup(product_buttons + action_buttons)
@@ -55,3 +59,9 @@ async def delete_keyboard(chat_id, context):
             log(f"Не вдалося видалити клавіатуру: {e}")
         finally:
             chat_data[chat_id]['keyboard_message_id'] = None
+
+async def remove_keyboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Видаляю клавіатуру...",
+        reply_markup=ReplyKeyboardRemove()
+    )

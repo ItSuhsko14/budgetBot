@@ -62,6 +62,18 @@ def create_tables():
                 );
             """)
 
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS categories (
+                    category_id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    chat_id BIGINT NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    UNIQUE(name, chat_id)  -- унікальна пара назва категорії та чат
+                );
+            """)
+
             conn.commit()
             log("✅ Таблиці створені або оновлені успішно")
         except Exception as e:
