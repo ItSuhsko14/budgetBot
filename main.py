@@ -7,8 +7,6 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-from telegram.error import TelegramError
-
 from handlers.start_handler import start
 from handlers.message_handler import handle_message
 from handlers.button_handler import button
@@ -28,15 +26,38 @@ def load_env():
 
 async def error_handler(update, context: ContextTypes.DEFAULT_TYPE):
     """Глобальний обробник винятків"""
-    logger.error("❌ Виникла помилка в обробці оновлення:", exc_info=context.error)
+    error = context.error
 
+    error_message = (
+        f"❌ Виникла помилка в обробці оновлення:\n"
+        f"• Тип помилки: {error.__class__.__name__}\n"
+        f"• Повідомлення: {str(error)}\n"
+    )
+
+     # Додаємо інформацію про оновлення, якщо воно є
+    if update:
+        update_info = []
+        if update.effective_message:
+            update_info.append(f"Чат ID: {update.effective_message.chat_id}")
+            update_info.append(f"Текст повідомлення: {update.effective_message.text}")
+        if update.callback_query:
+            update_info.append(f"Callback data: {update.callback_query.data}")
+        
+        error_message += "• " + "\n• ".join(update_info) + "\n"
+    
+     # Логуємо помилку з трасуванням стеку
+    log(error_message, exc_info=True)
+
+     # Надсилаємо зрозуміле повідомлення користувачу
+    user_message = (
+        "⚠️ Вибачте, сталася помилка.\n"
+    )
     # Повідомлення користувачу (опціонально, якщо хочеш зворотній зв'язок)
     try:
         if update and update.effective_message:
-            await update.effective_message.reply_text("⚠️ Виникла технічна помилка. Ми вже над цим працюємо.")
-    except TelegramError:
-        pass  # Не можемо навіть відповісти користувачу
-
+            await update.effective_message.reply_text(user_message)
+    except Exception as e:
+        log(f"Не вдалося надіслати повідомлення про помилку: {e}")
 
 # --- Запуск ---
 load_env()
