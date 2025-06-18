@@ -1,6 +1,5 @@
 # Основні залежності
 python-telegram-bot[webhooks]==21.8
-flask
 gunicorn
 python-dotenv
 
