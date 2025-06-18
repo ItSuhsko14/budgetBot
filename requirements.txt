@@ -1,5 +1,19 @@
+# Основні залежності
 python-telegram-bot[webhooks]==21.8
-flask
 gunicorn
 python-dotenv
-psycopg2-binary
+
+# Робота з базою даних
+psycopg2-binary>=2.9.9
+
+# HTTP запити
+requests>=2.31.0
+
+# Обробка зображень
+Pillow>=10.0.0
+
+# Переклад
+deep-translator>=1.11.4
+
+# Інші бібліотеки
+python-dateutil>=2.8.2
