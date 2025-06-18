@@ -8,6 +8,8 @@ def initialize_chat(chat_id):
             'list_items': [],
             'removed_items': [],
             'purchased_items': [],
+            'selected_items': [],
+            'keyboard_message_id': None,
             'list_message_id': None,
             'purchase_mode': False,
             'awaiting_cost': False,

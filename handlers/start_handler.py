@@ -1,10 +1,13 @@
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from data.chat_data import chat_data
-from utils.logger import logger
+from utils.logger import log
+from utils.keyboard import create_keyboard, remove_keyboard
+from data.db_service import get_active_products_by_chat
+
 
 async def start(update: Update, context: CallbackContext):
-    logger.info(f"/start від {update.message.from_user.username} у чаті {update.effective_chat.id}")
+    log(f"/start від {update.message.from_user.username} у чаті {update.effective_chat.id}")
     chat_id = update.effective_chat.id
 
     # Перевіряємо чи існує запис для цього чату, якщо ні — створюємо
@@ -13,21 +16,20 @@ async def start(update: Update, context: CallbackContext):
             'list_items': [],
             'removed_items': [],
             'purchased_items': [],
+            'selected_items': [],
+            'keyboard_message_id': None,
             'list_message_id': None,
             'purchase_mode': False,
             'awaiting_cost': False,
             'purchased_message_id': None,
-            'ephemeral_messages': []  # Ініціалізуємо порожній список для ефемерних повідомлень
+            'ephemeral_messages': [],
+            'prompt_message_id': None
         }
 
-    keyboard = [
-        [KeyboardButton("Додати товар")],
-        [KeyboardButton("Видалити товар")],
-        [KeyboardButton("Позначити купленими")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+    products = get_active_products_by_chat(chat_id)
 
-    await update.message.reply_text(
-        "Привіт! Я бот для списків покупок! Оберіть дію:",
-        reply_markup=reply_markup
-    )
+    # Зберігаємо в локальний стейт
+    chat_data[chat_id]['list_items'] = products
+    await remove_keyboard(update, context)
+    await create_keyboard(chat_id, update)
+    

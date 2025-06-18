@@ -7,13 +7,11 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-from telegram.error import TelegramError
-
 from handlers.start_handler import start
 from handlers.message_handler import handle_message
 from handlers.button_handler import button
 from data.database import create_tables
-from utils.logger import logger
+from utils.logger import log
 
 
 def load_env():
@@ -28,15 +26,38 @@ def load_env():
 
 async def error_handler(update, context: ContextTypes.DEFAULT_TYPE):
     """Глобальний обробник винятків"""
-    logger.error("❌ Виникла помилка в обробці оновлення:", exc_info=context.error)
+    log("❌ Виникла помилка в обробці оновлення", exc_info=True)
 
+    error_message = (
+        f"❌ Виникла помилка в обробці оновлення:\n"
+        f"• Тип помилки: {error.__class__.__name__}\n"
+        f"• Повідомлення: {str(error)}\n"
+    )
+
+     # Додаємо інформацію про оновлення, якщо воно є
+    if update:
+        update_info = []
+        if update.effective_message:
+            update_info.append(f"Чат ID: {update.effective_message.chat_id}")
+            update_info.append(f"Текст повідомлення: {update.effective_message.text}")
+        if update.callback_query:
+            update_info.append(f"Callback data: {update.callback_query.data}")
+        
+        error_message += "• " + "\n• ".join(update_info) + "\n"
+    
+     # Логуємо помилку з трасуванням стеку
+    log(error_message, exc_info=True)
+
+     # Надсилаємо зрозуміле повідомлення користувачу
+    user_message = (
+        "⚠️ Вибачте, сталася помилка.\n"
+    )
     # Повідомлення користувачу (опціонально, якщо хочеш зворотній зв'язок)
     try:
         if update and update.effective_message:
-            await update.effective_message.reply_text("⚠️ Виникла технічна помилка. Ми вже над цим працюємо.")
-    except TelegramError:
-        pass  # Не можемо навіть відповісти користувачу
-
+            await update.effective_message.reply_text(user_message)
+    except Exception as e:
+        log(f"Не вдалося надіслати повідомлення про помилку: {e}")
 
 # --- Запуск ---
 load_env()
@@ -47,7 +68,7 @@ PORT = int(os.getenv("PORT", 8443))
 
 if __name__ == "__main__":
     try:
-        logger.info("🚀 Запуск бота...")
+        log("🚀 Запуск бота...")
 
         create_tables()
 
@@ -55,18 +76,18 @@ if __name__ == "__main__":
 
         # Handlers
         application.add_handler(CommandHandler("start", start))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+        application.add_handler(MessageHandler(~filters.COMMAND, handle_message))
         application.add_handler(CallbackQueryHandler(button))
 
         # Error handler
         application.add_error_handler(error_handler)
 
-        logger.info(f"🌐 Бот працює на порту {PORT}")
+        log(f"🌐 Бот працює на порту {PORT}")
         application.run_webhook(
             listen="0.0.0.0",
             port=PORT,
             webhook_url=WEBHOOK_URL,
         )
 
-    except Exception as e:
-        logger.error(f"❌ Помилка запуску: {e}", exc_info=True)
+    except Exception:
+        log("❌ Помилка запуску", exc_info=True)
