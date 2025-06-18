@@ -33,51 +33,51 @@ def create_tables():
     if conn:
         cur = conn.cursor()
 
-        # Створення таблиці `products`
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            product_id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL,
-            chat_id BIGINT NOT NULL,
-            status TEXT NOT NULL CHECK (status IN ('active', 'deleted', 'purchased')) DEFAULT 'active'
-        );
-        """)
+        try:
+            # Створення таблиці `products`
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS products (
+                product_id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                category TEXT NOT NULL,
+                chat_id BIGINT NOT NULL,
+                status TEXT NOT NULL CHECK (status IN ('active', 'deleted', 'purchased')) DEFAULT 'active'
+            );
+            """)
 
-        # Створення таблиці `expenses`
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS expenses (
-            expense_id SERIAL PRIMARY KEY,
-            expense_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            amount NUMERIC(10, 2) NOT NULL,
-            category TEXT NOT NULL,
-            product_ids INTEGER[] NOT NULL,
-            chat_id BIGINT NOT NULL
-        );
-        """)
+            # Створення таблиці `expenses`
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS expenses (
+                expense_id SERIAL PRIMARY KEY,
+                expense_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                amount NUMERIC(10, 2) NOT NULL,
+                category TEXT NOT NULL,
+                product_ids INTEGER[] NOT NULL,
+                chat_id BIGINT NOT NULL
+            );
+            """)
 
-        # Створення таблиці `categories`
-        cur.execute("""
+            # Створення таблиці `categories`
+            cur.execute("""
             CREATE TABLE IF NOT EXISTS categories (
                 category_id SERIAL PRIMARY KEY,
                 name TEXT NOT NULL,
                 chat_id BIGINT NOT NULL,
-                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    is_active BOOLEAN DEFAULT TRUE,
-                    UNIQUE(name, chat_id)  -- унікальна пара назва категорії та чат
-                );
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE,
+                UNIQUE(name, chat_id)  -- унікальна пара назва категорії та чат
+            );
             """)
 
-        conn.commit()
-        log("✅ Таблиці створені або оновлені успішно")
-    except Exception as e:
-        log(f"❌ Помилка під час створення таблиць: {e}")
-    finally:
-        cur.close()
-        conn.close()
-
-    else:
-        print("🔴 Не вдалося створити таблиці.")
+            conn.commit()
+            print("✅ Таблиці створені або оновлені успішно")
+        except Exception as e:
+            print(f"❌ Помилка створення таблиць: {e}")
+        finally:
+            if 'cur' in locals() and cur:
+                cur.close()
+            if 'conn' in locals() and conn:
+                conn.close()
 
 # CRUD-функції для витрат
 def add_expense(amount, category, product_ids, chat_id):
