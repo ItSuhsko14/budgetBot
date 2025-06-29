@@ -9,11 +9,15 @@ def initialize_chat(chat_id):
             'removed_items': [],
             'purchased_items': [],
             'selected_items': [],
+            'selected_categories': [],
             'keyboard_message_id': None,
             'list_message_id': None,
             'purchase_mode': False,
             'awaiting_cost': False,
+            'category_mode': False,
+            'current_category': None,
             'purchased_message_id': None,
             'ephemeral_messages': [],
-            'prompt_message_id': None
+            'prompt_message_id': None, 
+            'current_category': None
         }

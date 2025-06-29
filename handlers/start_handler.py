@@ -3,7 +3,8 @@ from telegram.ext import CallbackContext
 from data.chat_data import chat_data
 from utils.logger import log
 from utils.keyboard import create_keyboard, remove_keyboard
-from data.db_service import get_active_products_by_chat
+from data.db_service import get_active_products_by_chat, get_all_categories
+from utils.initialize_chat import initialize_chat
 
 
 async def start(update: Update, context: CallbackContext):
@@ -12,24 +13,14 @@ async def start(update: Update, context: CallbackContext):
 
     # Перевіряємо чи існує запис для цього чату, якщо ні — створюємо
     if chat_id not in chat_data:
-        chat_data[chat_id] = {
-            'list_items': [],
-            'removed_items': [],
-            'purchased_items': [],
-            'selected_items': [],
-            'keyboard_message_id': None,
-            'list_message_id': None,
-            'purchase_mode': False,
-            'awaiting_cost': False,
-            'purchased_message_id': None,
-            'ephemeral_messages': [],
-            'prompt_message_id': None
-        }
+        initialize_chat(chat_id)
 
     products = get_active_products_by_chat(chat_id)
+    categories = get_all_categories(chat_id)
 
     # Зберігаємо в локальний стейт
     chat_data[chat_id]['list_items'] = products
+    chat_data[chat_id]['categories'] = categories
     await remove_keyboard(update, context)
-    await create_keyboard(chat_id, update)
+    await create_keyboard(chat_id, context)
     
