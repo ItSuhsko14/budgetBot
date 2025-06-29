@@ -39,7 +39,7 @@ def create_tables():
             CREATE TABLE IF NOT EXISTS products (
                 product_id SERIAL PRIMARY KEY,
                 name TEXT NOT NULL,
-                category TEXT NOT NULL,
+                category INTEGER,
                 chat_id BIGINT NOT NULL,
                 status TEXT NOT NULL CHECK (status IN ('active', 'deleted', 'purchased')) DEFAULT 'active'
             );
@@ -51,7 +51,7 @@ def create_tables():
                 expense_id SERIAL PRIMARY KEY,
                 expense_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 amount NUMERIC(10, 2) NOT NULL,
-                category TEXT NOT NULL,
+                category INTEGER REFERENCES categories(category_id) ON DELETE SET NULL,
                 product_ids INTEGER[] NOT NULL,
                 chat_id BIGINT NOT NULL
             );

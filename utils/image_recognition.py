@@ -48,11 +48,11 @@ async def classify_image_from_telegram(bot: Bot, telegram_file_id: str) -> str:
         )
         
         # 4. Логуємо відповідь
-        log(f"Статус відповіді: {response.status_code}")
-        log(f"Заголовки відповіді: {response.headers}")
-        log(f"Тіло відповіді: {response.text[:500]}")
+        log(f"\nСтатус відповіді: {response.status_code}")
+        log(f"\nЗаголовки відповіді: {response.headers}")
+        log(f"\nТіло відповіді: {response.text[:500]}")
 
-        # 5. Обробляємо відповідь
+        # 5. Обробляємо відповідь   
         if response.status_code != 200:
             log(f"Помилка API: {response.status_code} - {response.text}")
             return f"❌ Помилка розпізнавання зображення (код {response.status_code})"

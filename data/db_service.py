@@ -1,7 +1,9 @@
 from data.database import connect_to_database
+from utils.logger import log
 
 # Додавання товару в таблицю products
-def add_product(chat_id, name, category):
+def add_product(chat_id, name, category=None):
+
     conn = connect_to_database()
     if conn:
         cur = conn.cursor()
@@ -25,6 +27,69 @@ def add_product(chat_id, name, category):
         finally:
             cur.close()
             conn.close()
+
+def make_db_request_by_query(query, params):
+    conn = None
+    try:
+        conn = connect_to_database()
+        if not conn:
+            log("❌ Помилка підключення до бази даних")
+            return None
+            
+        cur = conn.cursor()
+        cur.execute(query, params)
+       # Для SELECT запитів повертаємо результати
+        if query.strip().upper().startswith('SELECT'):
+            result = cur.fetchall()
+        # Для інших запитів повертаємо кількість змінених рядків
+        else:
+            result = cur.rowcount
+        conn.commit()
+        return result
+    except Exception as e:
+        log(f"❌ Помилка при запиті в базу: {e}")
+        if conn:
+            conn.rollback()
+        return None
+    finally:
+        if conn:
+            try:
+                if 'cur' in locals() and cur:
+                    cur.close()
+                conn.close()
+            except Exception as e:
+                log(f"❌ Помилка при закритті з'єднання: {e}")
+    
+def create_category(chat_id, name):
+    return make_db_request_by_query("""
+            INSERT INTO categories (chat_id, name)
+            VALUES (%s, %s)
+            RETURNING category_id;
+        """, (chat_id, name))
+            
+
+def get_all_categories(chat_id):
+    result = make_db_request_by_query("""
+        SELECT category_id, name
+        FROM categories
+        WHERE chat_id = %s
+        ORDER BY name;
+    """, (chat_id,))
+    
+    # Повертаємо порожній список, якщо результатів немає
+    return result if result else []
+
+def delete_category_from_db(chat_id, category_id):
+    category = make_db_request_by_query("""
+            SELECT name, category_id
+            FROM categories
+            WHERE category_id = %s and chat_id = %s;
+        """, (category_id, chat_id))
+    log(f"✅ Категорія {category} з ID {category_id} видалена")
+    return make_db_request_by_query("""
+            DELETE FROM categories
+            WHERE category_id = %s and chat_id = %s;
+        """, (category_id, chat_id))
 
 def get_active_products_by_chat(chat_id):
     conn = connect_to_database()
@@ -81,7 +146,7 @@ def mark_product_as_deleted(product_id):
             cur.close()
             conn.close()
 
-def add_expense(amount, category, product_ids, chat_id):
+def add_expense(amount, product_ids, chat_id, category=None):
     """
     Додає витрату в таблицю expenses.
 

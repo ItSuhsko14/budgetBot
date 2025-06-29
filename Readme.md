@@ -117,3 +117,21 @@ curl -X GET "https://api.telegram.org/bot<BOT_TOKEN>/getMe"
 
 # connect to database from terminal
 psql -h localhost -p 5432 -U botuser -d budgettestdb
+
+
+Змінити категорії в таблиці продукти на інтежер
+
+ALTER TABLE products
+ALTER COLUMN category DROP NOT NULL;
+
+потім
+
+UPDATE products
+SET category = NULL
+WHERE category !~ '^\d+$';
+
+потім
+
+ALTER TABLE products
+ALTER COLUMN category TYPE INTEGER
+USING category::INTEGER;
