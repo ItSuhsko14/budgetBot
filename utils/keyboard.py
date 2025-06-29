@@ -5,11 +5,7 @@ from telegram import ReplyKeyboardRemove
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 
-def create_product_list_by_categories(products):
-    log("create_product_list_by_categories")
-
 def createOneProductButton(product, chat_id):
-        log("CreateOneProductButton")
         if product[0] in chat_data[chat_id].get('selected_items', []):
             log(f"{product[0], product[1]} позначено виділеним")
             return InlineKeyboardButton(f"✅ {product[1]}", callback_data=f"unselect:{product[0]}")
@@ -17,11 +13,9 @@ def createOneProductButton(product, chat_id):
             return InlineKeyboardButton(product[1], callback_data=f"select:{product[0]}")
 
 def createProductGroupButtons(products, chat_id):
-    log("createProductGroupButtons")
     return [[createOneProductButton(product, chat_id)] for product in products]
 
 def createOneCategoryButton(category):
-    log("createOneCategoryButton")
     return InlineKeyboardButton(str(f"--- {category[1]} ---"), callback_data=f"add_product_with_category:{category[0]}")
 
 async def create_keyboard_keys(chat_id):
