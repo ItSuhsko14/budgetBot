@@ -147,7 +147,10 @@ async def delete_keyboard(chat_id, context):
             chat_data[chat_id]['keyboard_message_id'] = None
 
 async def remove_keyboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "Видаляю клавіатуру...",
-        reply_markup=ReplyKeyboardRemove()
-    )
+    try:
+        await update.message.reply_text(
+            "Видаляю клавіатуру...",
+            reply_markup=ReplyKeyboardRemove()
+        )
+    except Exception as e:
+        log(f"Не вдалося видалити клавіатуру: {e}")
