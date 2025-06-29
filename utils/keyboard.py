@@ -16,7 +16,13 @@ def createProductGroupButtons(products, chat_id):
     return [[createOneProductButton(product, chat_id)] for product in products]
 
 def createOneCategoryButton(category):
-    return InlineKeyboardButton(str(f"--- {category[1]} ---"), callback_data=f"add_product_with_category:{category[0]}")
+    wide_button = InlineKeyboardButton(
+        f"🟢 {category[1].ljust(15, ' ')}", 
+        callback_data=f"view_category:{category[0]}"
+    )
+    add_btn = InlineKeyboardButton("➕ додати товар", callback_data=f"add_product_with_category:{category[0]}")
+    
+    return [wide_button, add_btn]
 
 async def create_keyboard_keys(chat_id):
     products = chat_data[chat_id]['list_items']
@@ -24,7 +30,7 @@ async def create_keyboard_keys(chat_id):
     buttons = []
 
     for category in categories:
-        buttons.append([createOneCategoryButton(category)])
+        buttons.append(createOneCategoryButton(category))
         category_products = []
         for p in products:
             try:
@@ -43,13 +49,12 @@ async def create_keyboard_keys(chat_id):
             without_category_products.append(product)
 
     without_category_products_group = createProductGroupButtons(without_category_products, chat_id)
-    buttons.append([InlineKeyboardButton("--- Без категорії ---", callback_data="no_category")])
+    buttons.append([InlineKeyboardButton("🟢 Товари без категорії", callback_data="no_category"), InlineKeyboardButton("➕ Додати товар", callback_data="add_product")])
     buttons.extend(without_category_products_group)
     
     # Додаємо кнопки дій
-    separator = InlineKeyboardButton(" ", callback_data="noop")
+    # separator = InlineKeyboardButton(" ", callback_data="noop")
     action_buttons = [
-        [separator],
         [InlineKeyboardButton("➕ Додати товар", callback_data="add_product"),
         InlineKeyboardButton("❌ Видалити товар", callback_data="finish_deleting")],
         [InlineKeyboardButton("✅ Позначити купленими", callback_data="finish_purchasing")],
@@ -142,9 +147,6 @@ async def delete_keyboard(chat_id, context):
 
 async def remove_keyboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        await update.message.reply_text(
-            "Видаляю клавіатуру...",
-            reply_markup=ReplyKeyboardRemove()
-        )
+        log("Видаляю клавіатуру...")
     except Exception as e:
         log(f"Не вдалося видалити клавіатуру: {e}")

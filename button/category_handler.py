@@ -4,6 +4,7 @@ from utils.logger import log
 from data.db_service import create_category, delete_category_from_db, get_all_categories
 from utils.keyboard import create_category_keyboard, create_keyboard, update_keyboard, delete_keyboard
 from data.chat_data import chat_data
+from utils.message import write_message
 
 async def add_category(chat_id, context):
     log(f"Запит на додавання категорії")
@@ -16,13 +17,35 @@ async def add_category(chat_id, context):
         text="Введіть назву нової категорії:"
     )
 
+def exist_products_with_category(chat_id, category_id):
+    log(f"exsisting product check category_id: {category_id}")
+    try:
+        category_id = int(category_id)
+    except ValueError:
+        log(f"❌ Неможливо привести category_id до числа: {category_id}")
+        return False
+    
+    products = chat_data[chat_id]['list_items']
+    for product in products:
+        log(f"product: {product} category_id: {product[2]}")
+        if product[2] == category_id:
+            log(f"✅ Product with category_id: {category_id} exists")
+            return True
+    log(f"❌ Product with category_id: {category_id} does not exist")
+    return False
+
 async def delete_category(chat_id, context):
     log(f"✅ Видалено категорію")
     selected_categories = chat_data[chat_id]['selected_categories']
     log(f"✅ selected_categories: {selected_categories}")
     for category_id in selected_categories:
-        log(f"✅ Категорія {category_id} з ID {category_id} видалена")
-        delete_category_from_db(chat_id, category_id)
+        log(f"✅ category_id: {category_id}")
+        if exist_products_with_category(chat_id, category_id):
+            await write_message(chat_id, f"Категорія {category_id} не видалена. Спочатку видаліть всі товари з цієї категорії", context)
+        else:
+            delete_category_from_db(chat_id, category_id)
+            log(f"✅ Категорія {category_id} з ID {category_id} видалена")
+
     chat_data[chat_id]['selected_categories'] = []
     actual_categories = get_all_categories(chat_id)
     log(f"✅ actual_categories: {actual_categories}")
