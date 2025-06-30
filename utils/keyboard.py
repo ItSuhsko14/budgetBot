@@ -15,11 +15,12 @@ def createOneProductButton(product, chat_id):
 def createProductGroupButtons(products, chat_id):
     return [[createOneProductButton(product, chat_id)] for product in products]
 
-def createOneCategoryButton(category):
-    wide_button = InlineKeyboardButton(
-        f"🟢 {category[1].ljust(15, ' ')}", 
-        callback_data=f"view_category:{category[0]}"
-    )
+def createOneCategoryButton(category, chat_id):
+    if str(category[0]) in chat_data[chat_id].get('selected_categories', []):
+        log(f"{category[0], category[1]} позначено виділеним")
+        wide_button = InlineKeyboardButton(f"✅ --- {category[1]}", callback_data=f"unselect_category:{category[0]}")
+    else:
+        wide_button = InlineKeyboardButton(f"--- {category[1]}", callback_data=f"select_category:{category[0]}")
     add_btn = InlineKeyboardButton("➕ додати товар", callback_data=f"add_product_with_category:{category[0]}")
     
     return [wide_button, add_btn]
@@ -30,7 +31,7 @@ async def create_keyboard_keys(chat_id):
     buttons = []
 
     for category in categories:
-        buttons.append(createOneCategoryButton(category))
+        buttons.append(createOneCategoryButton(category, chat_id))
         category_products = []
         for p in products:
             try:
@@ -49,7 +50,8 @@ async def create_keyboard_keys(chat_id):
             without_category_products.append(product)
 
     without_category_products_group = createProductGroupButtons(without_category_products, chat_id)
-    buttons.append([InlineKeyboardButton("🟢 Товари без категорії", callback_data="no_category"), InlineKeyboardButton("➕ Додати товар", callback_data="add_product")])
+    if (len(without_category_products) > 0):
+        buttons.append([InlineKeyboardButton("--- Без категорії", callback_data="no_category"), InlineKeyboardButton("➕ Додати товар", callback_data="add_product")])
     buttons.extend(without_category_products_group)
     
     # Додаємо кнопки дій
@@ -57,35 +59,11 @@ async def create_keyboard_keys(chat_id):
     action_buttons = [
         [InlineKeyboardButton("➕ Додати товар", callback_data="add_product"),
         InlineKeyboardButton("❌ Видалити товар", callback_data="finish_deleting")],
+        [InlineKeyboardButton("➕ Додати категорію", callback_data="add_category"),
+        InlineKeyboardButton("❌ Видалити категорію", callback_data="delete_category")],
         [InlineKeyboardButton("✅ Позначити купленими", callback_data="finish_purchasing")],
-        [InlineKeyboardButton("Редагувати категорії", callback_data="category_mode")],
     ]
     return InlineKeyboardMarkup(buttons + action_buttons)
-
-async def create_category_keyboard_keys(chat_id):
-    categories = chat_data[chat_id]['categories']
-
-    # Створюємо кнопки для кожної категорії
-    category_buttons = []
-    for category in categories:
-        category_id, category_name = category
-        if str(category[0]) in chat_data[chat_id].get('selected_categories', []):
-            log(f"{category[0], category[1]} позначено виділеним")
-            button = InlineKeyboardButton(f"✅ {category[1]}", callback_data=f"unselect_category:{category[0]}")
-        else:
-            button = InlineKeyboardButton(category_name, callback_data=f"select_category:{category_id}")
-        category_buttons.append([button])
-
-    # Додаємо кнопки дій
-    action_buttons = [
-        [InlineKeyboardButton("➕ Додати категорію", callback_data="add_category")],
-        [InlineKeyboardButton("❌ Видалити категорію", callback_data="delete_category")],
-        [InlineKeyboardButton("🔙 Назад", callback_data="back_to_products")]
-    ]
-
-    # Об'єднуємо всі кнопки
-    all_buttons = category_buttons + action_buttons
-    return InlineKeyboardMarkup(all_buttons)
 
 async def create_keyboard(chat_id, context=None):
     # Обʼєднуємо все в одну клавіатуру
@@ -97,26 +75,13 @@ async def create_keyboard(chat_id, context=None):
     chat_data[chat_id]['keyboard_message_id'] = keyboard_message.message_id
     return keyboard_message
 
-async def create_category_keyboard(chat_id, context=None):
-    full_keyboard = await create_category_keyboard_keys(chat_id)
-
-    keyboard_message = await context.bot.send_message(chat_id, "Ваш список категорій:", reply_markup=full_keyboard)
-    
-    chat_data[chat_id]['keyboard_message_id'] = keyboard_message.message_id
-    return keyboard_message
-    
-
 async def update_keyboard(chat_id, context):
     if chat_id not in chat_data or 'keyboard_message_id' not in chat_data[chat_id]:
         log("Повідомлення з клавіатурою не знайдено")
         return
 
-    if chat_data[chat_id].get('category_mode', True):
-        new_keyboard = await create_category_keyboard_keys(chat_id)
-        message_text = "Ваш список категорій:"
-    else:
-        new_keyboard = await create_keyboard_keys(chat_id)
-        message_text = "Ваш список товарів:"
+    new_keyboard = await create_keyboard_keys(chat_id)
+    message_text = "Ваш список товарів:"
     
     # Оновлюємо клавіатуру
     keyboard_message_id = chat_data[chat_id]['keyboard_message_id']
