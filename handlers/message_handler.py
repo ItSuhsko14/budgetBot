@@ -10,7 +10,7 @@ from data.db_service import (
     add_expense
 )
 from utils.initialize_chat import initialize_chat
-from utils.keyboard import delete_keyboard, create_keyboard, create_category_keyboard
+from utils.keyboard import delete_keyboard, create_keyboard
 from utils.product_text_handler import split_text_to_items
 from utils.image_recognition import classify_image_from_telegram
 from data.db_service import get_all_categories, create_category
@@ -99,7 +99,7 @@ async def handle_message(update: Update, context: CallbackContext):
                 chat_id=chat_id,
                 text=f"✅ Категорію '{category_name}' успішно створено!"
             )
-            await create_category_keyboard(chat_id, context)
+            await create_keyboard(chat_id, context)
             # Повідомляємо про успішне створення
             
             
@@ -118,10 +118,7 @@ async def handle_message(update: Update, context: CallbackContext):
         return
 
     elif 'list_items' in chat_data[chat_id]:
-        category_mode = chat_data[chat_id].get('category_mode', False)
-        log(f"category_mode: {category_mode}")
-        if not chat_data[chat_id].get('category_mode'):
-            category_id = chat_data[chat_id]['current_category']
-            log(f"category_id: {category_id}")
-            await add_products_from_text(chat_id, user_text, context, category_id)
-            chat_data[chat_id]['current_category'] = None
+        category_id = chat_data[chat_id]['current_category']
+        log(f"category_id: {category_id}")
+        await add_products_from_text(chat_id, user_text, context, category_id)
+        chat_data[chat_id]['current_category'] = None

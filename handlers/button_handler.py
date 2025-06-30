@@ -8,7 +8,7 @@ from utils.initialize_chat import initialize_chat
 from button.select import select_product, unselect_product
 from button.category_handler import select_category, unselect_category
 from utils.keyboard import update_keyboard
-from button.category_handler import add_category, delete_category, show_all_categories, category_mode, back_to_products
+from button.category_handler import add_category, delete_category
 from button.product_handler import add_product_with_category
 
 hadler_config = {
@@ -19,11 +19,8 @@ hadler_config = {
     "unselect": unselect_product,
     "select_category": select_category,
     "unselect_category": unselect_category,
-    "category_mode": category_mode,
     "add_category": add_category,
     "delete_category": delete_category,
-    "show_all_categories": show_all_categories,
-    "back_to_products": back_to_products,
     "add_product_with_category": add_product_with_category
 }
 

@@ -14,7 +14,6 @@ def initialize_chat(chat_id):
             'list_message_id': None,
             'purchase_mode': False,
             'awaiting_cost': False,
-            'category_mode': False,
             'current_category': None,
             'purchased_message_id': None,
             'ephemeral_messages': [],
