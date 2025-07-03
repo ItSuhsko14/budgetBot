@@ -28,6 +28,7 @@ async def error_handler(update, context: ContextTypes.DEFAULT_TYPE):
     """Глобальний обробник винятків"""
     log("❌ Виникла помилка в обробці оновлення", exc_info=True)
 
+    error = context.error
     error_message = (
         f"❌ Виникла помилка в обробці оновлення:\n"
         f"• Тип помилки: {error.__class__.__name__}\n"

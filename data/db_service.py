@@ -91,6 +91,15 @@ def delete_category_from_db(chat_id, category_id):
             WHERE category_id = %s and chat_id = %s;
         """, (category_id, chat_id))
 
+def getExpensesByChatForLastMonth(chat_id):
+    expenses = make_db_request_by_query("""
+        SELECT expense_id, expense_date, amount, category, product_ids
+        FROM expenses
+        WHERE chat_id = %s AND expense_date >= CURRENT_DATE - INTERVAL '1 month';
+    """, (chat_id,))
+    return expenses
+    
+
 def get_active_products_by_chat(chat_id):
     conn = connect_to_database()
     if conn:
