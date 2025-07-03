@@ -10,6 +10,7 @@ from button.category_handler import select_category, unselect_category
 from utils.keyboard import update_keyboard
 from button.category_handler import add_category, delete_category
 from button.product_handler import add_product_with_category
+from button.expenses_handler import show_expenses
 
 hadler_config = {
     "finish_deleting": finish_deleting,
@@ -21,7 +22,8 @@ hadler_config = {
     "unselect_category": unselect_category,
     "add_category": add_category,
     "delete_category": delete_category,
-    "add_product_with_category": add_product_with_category
+    "add_product_with_category": add_product_with_category,
+    "show_expenses": show_expenses
 }
 
 async def button(update: Update, context: CallbackContext):

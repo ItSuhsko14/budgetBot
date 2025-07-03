@@ -57,11 +57,11 @@ async def create_keyboard_keys(chat_id):
     # Додаємо кнопки дій
     # separator = InlineKeyboardButton(" ", callback_data="noop")
     action_buttons = [
-        [InlineKeyboardButton("➕ Додати товар", callback_data="add_product"),
+        [InlineKeyboardButton("✅ Позначити купленими", callback_data="finish_purchasing"),
         InlineKeyboardButton("❌ Видалити товар", callback_data="finish_deleting")],
         [InlineKeyboardButton("➕ Додати категорію", callback_data="add_category"),
         InlineKeyboardButton("❌ Видалити категорію", callback_data="delete_category")],
-        [InlineKeyboardButton("✅ Позначити купленими", callback_data="finish_purchasing")],
+        [InlineKeyboardButton("📊 Показати витрати за місяць", callback_data="show_expenses")],
     ]
     return InlineKeyboardMarkup(buttons + action_buttons)
 
