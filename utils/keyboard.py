@@ -70,7 +70,7 @@ async def create_keyboard(chat_id, context=None):
     full_keyboard = await create_keyboard_keys(chat_id)
 
     # Надсилаємо повідомлення
-    keyboard_message = await context.bot.send_message(chat_id, "Ваш список товарів:", reply_markup=full_keyboard)
+    keyboard_message = await context.bot.send_message(chat_id, "Список продуктів", reply_markup=full_keyboard)
     
     chat_data[chat_id]['keyboard_message_id'] = keyboard_message.message_id
     return keyboard_message
@@ -81,7 +81,6 @@ async def update_keyboard(chat_id, context):
         return
 
     new_keyboard = await create_keyboard_keys(chat_id)
-    message_text = "Ваш список товарів:"
     
     # Оновлюємо клавіатуру
     keyboard_message_id = chat_data[chat_id]['keyboard_message_id']
