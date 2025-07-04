@@ -18,12 +18,12 @@ def add_product(chat_id, name, category=None):
             if result:
                 product_id = result[0]
                 conn.commit()
-                print(f"✅ Товар '{name}' додано з ID {product_id}.")
+                log(f"✅ Товар '{name}' додано з ID {product_id}.")
                 return product_id
             else:
-                print("❌ Помилка: INSERT не повернув ID.")
+                log("❌ Помилка: INSERT не повернув ID.")
         except Exception as e:
-            print(f"❌ Помилка додавання товару: {e}")
+            log(f"❌ Помилка в add_product: {e}")
         finally:
             cur.close()
             conn.close()
@@ -131,7 +131,7 @@ def get_products_by_ids(product_ids):
             """, (list(map(int, product_ids)),))
             return cur.fetchall()
         except Exception as e:
-            print(f"❌ Помилка отримання товарів за ID: {e}")
+            log(f"❌ Помилка в get_products_by_ids: {e}")
         finally:
             cur.close()
             conn.close()
@@ -148,9 +148,9 @@ def mark_product_as_deleted(product_id):
                 WHERE product_id = %s;
             """, (product_id,))
             conn.commit()
-            print(f"✅ Товар з ID {product_id} успішно відмічено як 'видалений'.")
+            log(f"✅ Товар з ID {product_id} успішно відмічено як 'видалений'.")
         except Exception as e:
-            print(f"❌ Помилка відмічення товару як 'видалений': {e}")
+            log(f"❌ Помилка в mark_product_as_deleted: {e}")
         finally:
             cur.close()
             conn.close()
@@ -179,12 +179,12 @@ def add_expense(amount, product_ids, chat_id, category=None):
             if result:
                 expense_id, expense_date = result
                 conn.commit()
-                print(f"✅ Витрату з ID {expense_id} додано на {expense_date}.")
+                log(f"✅ Витрату з ID {expense_id} додано на {expense_date}.")
                 return expense_id
             else:
-                print("❌ Помилка: INSERT не повернув ID витрати.")
+                log("❌ Помилка: INSERT не повернув ID витрати.")
         except Exception as e:
-            print(f"❌ Помилка додавання витрати: {e}")
+            log(f"❌ Помилка в add_expense: {e}")
         finally:
             cur.close()
             conn.close()
@@ -203,9 +203,9 @@ def mark_product_as_purchased(product_id):
                 WHERE product_id = %s;
             """, (product_id,))
             conn.commit()
-            print(f"✅ Товар з ID {product_id} позначено як 'purchased'.")
+            log(f"✅ Товар з ID {product_id} позначено як 'purchased'.")
         except Exception as e:
-            print(f"❌ Помилка позначення товару як 'purchased': {e}")
+            log(f"❌ Помилка в mark_product_as_purchased: {e}")
         finally:
             cur.close()
             conn.close()
