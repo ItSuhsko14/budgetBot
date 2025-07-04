@@ -2,6 +2,7 @@ import os
 import psycopg2
 import sys
 import time  
+from utils.logger import log
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.env_loader import load_env
@@ -15,20 +16,20 @@ def connect_to_database(retries=5, delay=2):
     for attempt in range(1, retries + 1):
         try:
             conn = psycopg2.connect(DATABASE_URL)
-            print(f"✅ Підключення успішне (спроба {attempt})")
+            log(f"✅ Підключення успішне (спроба {attempt})")
             return conn
         except Exception as e:
-            print(f"❌ Спроба {attempt} не вдалася: {e}")
+            log(f"❌ Помилка в connect_to_database: Спроба {attempt} не вдалася: {e}")
             if attempt < retries:
-                print(f"⏳ Очікування {delay} секунд перед наступною спробою...")
+                log(f"⏳ Очікування {delay} секунд перед наступною спробою...")
                 time.sleep(delay)
             else:
-                print("🔴 Вичерпано всі спроби підключення до бази даних.")
+                log("🔴 Вичерпано всі спроби підключення до бази даних.")
     return None
 
 # Створення таблиць
 def create_tables():
-    print(f"DATABASE_URL: {DATABASE_URL}")
+    log(f"DATABASE_URL: {DATABASE_URL}")
     conn = connect_to_database()
     if conn:
         cur = conn.cursor()
@@ -92,10 +93,10 @@ def add_expense(amount, category, product_ids, chat_id):
             """, (amount, category, [int(pid) for pid in product_ids], chat_id))
             expense_id = cur.fetchone()[0]
             conn.commit()
-            print(f"✅ Витрата з ID {expense_id} додана.")
+            log(f"✅ Витрата з ID {expense_id} додана.")
             return expense_id
         except Exception as e:
-            print(f"❌ Помилка додавання витрати: {e}")
+            log(f"❌ Помилка в add_expense: {e}")
         finally:
             cur.close()
             conn.close()

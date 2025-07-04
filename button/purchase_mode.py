@@ -17,30 +17,22 @@ def cancel_mode_awaiting_cost(chat_id):
 
 async def finalize_purchasing(chat_id, context: CallbackContext):
     product_ids = set(chat_data[chat_id]['selected_items'])
-    log(f"product_ids: {product_ids}")
+    log(f"finalize_purchasing product_ids: {product_ids}")
     category_ids = get_category_ids_from_product_ids(product_ids, chat_id)
-    log(f'is_all_categories_equal(category_ids): {is_all_categories_equal(category_ids)}')
     if not is_all_categories_equal(category_ids):
-        log("Товари з різних категорій is_all_categories_equal false")
         await write_message(chat_id, "Виберіть товари з однієї категорії для покупки", context)
         return
     make_mode_awaiting_cost(chat_id)
     purchased_products = chat_data[chat_id]['selected_items']
     await write_message(chat_id, "Введіть суму покупки:", context)
 
-    log(f"✅ Список куплених товарів: {purchased_products}")
 
 def get_category_ids_from_product_ids(product_ids, chat_id):
     products = chat_data[chat_id]['list_items']
-    for product in products:
-        log(f"Name product: {product[1]}, product_id: {product[0]}, category_id: {product[2]}") 
     category_ids = []
-    log(f"product_ids: {product_ids}")
     for product in products:
-        log(f"product[0], product[2]: {product[0], product[2]}")
         if product[0] in product_ids:
             category_ids.append(product[2])
-    log(f"category_ids: {category_ids}")
     return category_ids
 
 def is_all_categories_equal(category_ids):
@@ -74,7 +66,8 @@ async def handle_awaiting_cost(chat_id, context: CallbackContext, user_text):
                     text=text
                 )
             except Exception as e:
-                log(f"Не вдалося оновити повідомлення: {e}")
+                log(f"Помилка в handle_awaiting_cost: Не вдалося оновити повідомлення: {e}")
+                cancel_mode_awaiting_cost(chat_id)
         else:
             sent = await context.bot.send_message(chat_id, text)
             chat_data[chat_id]['purchased_message_id'] = sent.message_id
@@ -88,5 +81,6 @@ async def handle_awaiting_cost(chat_id, context: CallbackContext, user_text):
             cancel_mode_awaiting_cost(chat_id)
             return
     except ValueError:
+        log(f"Помилка в handle_awaiting_cost: Введено неправильну числову суму.")
         await context.bot.send_message(chat_id, "Введіть правильну числову суму.")
         return
