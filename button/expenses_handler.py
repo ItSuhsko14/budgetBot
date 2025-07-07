@@ -25,10 +25,13 @@ async def send_message_to_chat(chat_id, context, message):
     await context.bot.send_message(chat_id, message)
 
 def get_sum_expenses_by_category(chat_id, expenses):
+    log(f"get_sum_expenses_by_category expenses: {expenses}")
     expenses_by_category = {}
     for expense in expenses:
+        log(f"get_sum_expenses_by_category expense: {expense}")
         category = get_category_name_by_id(chat_id, expense[0]) or "Різне"
         amount = expense[2]
+        log(f"get_sum_expenses_by_category category: {category}, amount: {amount}")
         if category in expenses_by_category:
             expenses_by_category[category] += amount
         else:
