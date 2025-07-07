@@ -29,7 +29,7 @@ def get_sum_expenses_by_category(chat_id, expenses):
     expenses_by_category = {}
     for expense in expenses:
         log(f"get_sum_expenses_by_category expense: {expense}")
-        category = get_category_name_by_id(chat_id, expense[0]) or "Різне"
+        category = get_category_name_by_id(chat_id, expense[3]) or "Різне"
         amount = expense[2]
         log(f"get_sum_expenses_by_category category: {category}, amount: {amount}")
         if category in expenses_by_category:
