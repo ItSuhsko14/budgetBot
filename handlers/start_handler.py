@@ -7,6 +7,9 @@ from data.db_service import get_active_products_by_chat, get_all_categories
 from utils.initialize_chat import initialize_chat
 
 
+async def start_message(chat_id, context):
+    await context.bot.send_message(chat_id, "Привіт! Я бот для ведення бюджету.\n\n Додай мене в чат, де ти пишеш список покупок і зручно веди свої фінанси.")    
+
 async def start(update: Update, context: CallbackContext):
     log(f"/start від {update.message.from_user.username} у чаті {update.effective_chat.id}")
     chat_id = update.effective_chat.id
@@ -21,6 +24,7 @@ async def start(update: Update, context: CallbackContext):
     # Зберігаємо в локальний стейт
     chat_data[chat_id]['list_items'] = products
     chat_data[chat_id]['categories'] = categories
+    await start_message(chat_id, context)
     await remove_keyboard(update, context)
     await create_keyboard(chat_id, context)
     

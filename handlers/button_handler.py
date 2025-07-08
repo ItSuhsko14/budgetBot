@@ -11,6 +11,7 @@ from utils.keyboard import update_keyboard
 from button.category_handler import add_category, delete_category
 from button.product_handler import add_product_with_category
 from button.expenses_handler import show_expenses
+from button.info import send_info_message
 
 hadler_config = {
     "finish_deleting": finish_deleting,
@@ -23,8 +24,9 @@ hadler_config = {
     "add_category": add_category,
     "delete_category": delete_category,
     "add_product_with_category": add_product_with_category,
-    "show_expenses": show_expenses
-}
+    "show_expenses": show_expenses,
+    "info": send_info_message
+}   
 
 async def button(update: Update, context: CallbackContext):
     print("✅ Натиснуто кнопку", update.callback_query.data)

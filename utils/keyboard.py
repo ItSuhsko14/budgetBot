@@ -62,6 +62,7 @@ async def create_keyboard_keys(chat_id):
         [InlineKeyboardButton("➕ Додати категорію", callback_data="add_category"),
         InlineKeyboardButton("❌ Видалити категорію", callback_data="delete_category")],
         [InlineKeyboardButton("📊 Показати витрати за місяць", callback_data="show_expenses")],
+        [InlineKeyboardButton("ℹ️ Довідка", callback_data="info")]
     ]
     return InlineKeyboardMarkup(buttons + action_buttons)
 
