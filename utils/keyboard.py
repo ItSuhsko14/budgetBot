@@ -13,7 +13,27 @@ def createOneProductButton(product, chat_id):
             return InlineKeyboardButton(product[1], callback_data=f"select:{product[0]}")
 
 def createProductGroupButtons(products, chat_id):
-    return [[createOneProductButton(product, chat_id)] for product in products]
+    rows = []
+    current_row = []
+    current_length = 0
+    max_row_length = 30  # Можна регулювати
+
+    for product in products:
+        btn = createOneProductButton(product, chat_id)
+        btn_length = len(btn.text)
+
+        if current_length + btn_length > max_row_length and current_row:
+            rows.append(current_row)
+            current_row = [btn]
+            current_length = btn_length
+        else:
+            current_row.append(btn)
+            current_length += btn_length
+
+    if current_row:
+        rows.append(current_row)
+
+    return rows
 
 def createOneCategoryButton(category, chat_id):
     if str(category[0]) in chat_data[chat_id].get('selected_categories', []):
@@ -61,7 +81,8 @@ async def create_keyboard_keys(chat_id):
         InlineKeyboardButton("❌ Видалити товар", callback_data="finish_deleting")],
         [InlineKeyboardButton("➕ Додати категорію", callback_data="add_category"),
         InlineKeyboardButton("❌ Видалити категорію", callback_data="delete_category")],
-        [InlineKeyboardButton("📊 Показати витрати за місяць", callback_data="show_expenses")],
+        [InlineKeyboardButton("📊 Показати витрати за місяць", callback_data="show_expenses"),
+         InlineKeyboardButton("💳 Номер картки", callback_data="card_number")],
         [InlineKeyboardButton("ℹ️ Довідка", callback_data="info")]
     ]
     return InlineKeyboardMarkup(buttons + action_buttons)

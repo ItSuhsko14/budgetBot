@@ -30,4 +30,7 @@ raw_text = [
 info_text = "\n".join(raw_text)
 
 async def send_info_message(chat_id, context):
-    await context.bot.send_message(chat_id, info_text)    
+    await context.bot.send_message(chat_id, info_text)   
+
+async def send_card_number(chat_id, context) :
+    await context.bot.send_message(chat_id, "`1111 2222 3333 4444`", parse_mode='MarkdownV2') 
