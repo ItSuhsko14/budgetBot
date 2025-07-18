@@ -17,6 +17,7 @@ def initialize_chat(chat_id):
             'current_category': None,
             'purchased_message_id': None,
             'ephemeral_messages': [],
-            'prompt_message_id': None, 
-            'current_category': None
+            'prompt_message_id': None,
+            'current_category': None,
+            'hide_empty_category': False
         }
