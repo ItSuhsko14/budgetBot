@@ -49,3 +49,11 @@ async def select_category(chat_id, context, category_id):
 
 async def unselect_category(chat_id, context, category_id):
     chat_data[chat_id]['selected_categories'].remove(category_id)    
+
+async def hide_category(chat_id, context):
+    chat_data[chat_id]['hide_empty_category'] = True
+    await update_keyboard(chat_id, context)
+
+async def show_category(chat_id, context):
+    chat_data[chat_id]['hide_empty_category'] = False
+    await update_keyboard(chat_id, context)

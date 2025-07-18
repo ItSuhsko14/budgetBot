@@ -38,12 +38,18 @@ def createProductGroupButtons(products, chat_id):
 def createOneCategoryButton(category, chat_id):
     if str(category[0]) in chat_data[chat_id].get('selected_categories', []):
         log(f"{category[0], category[1]} позначено виділеним")
-        wide_button = InlineKeyboardButton(f"✅ --- {category[1]}", callback_data=f"unselect_category:{category[0]}")
+        wide_button = InlineKeyboardButton(f"✅ --- {category[1]} ---", callback_data=f"unselect_category:{category[0]}")
     else:
-        wide_button = InlineKeyboardButton(f"--- {category[1]}", callback_data=f"select_category:{category[0]}")
-    add_btn = InlineKeyboardButton("➕ додати товар", callback_data=f"add_product_with_category:{category[0]}")
+        wide_button = InlineKeyboardButton(f"--- {category[1]} ---", callback_data=f"select_category:{category[0]}")
+    add_btn = InlineKeyboardButton("➕ Додати товар", callback_data=f"add_product_with_category:{category[0]}")
     
     return [wide_button, add_btn]
+
+def create_hide_empty_category_button(chat_id):
+    if chat_data[chat_id]['hide_empty_category']:
+        return [[InlineKeyboardButton("➕ Показати порожні категорії", callback_data="show_category")]]
+    else:
+        return [[InlineKeyboardButton("➕ Сховати порожні категорії", callback_data="hide_category")]]
 
 async def create_keyboard_keys(chat_id):
     products = chat_data[chat_id]['list_items']
@@ -51,14 +57,17 @@ async def create_keyboard_keys(chat_id):
     buttons = []
 
     for category in categories:
-        buttons.append(createOneCategoryButton(category, chat_id))
         category_products = []
         for p in products:
             try:
                 if p[2] is not None and p[2] and p[2] == category[0]:
                     category_products.append(p)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, IndexError):
                 continue
+        
+        show_category = not chat_data[chat_id]['hide_empty_category'] or len(category_products) > 0
+        if show_category:
+            buttons.append(createOneCategoryButton(category, chat_id))
         product_buttons = createProductGroupButtons(category_products, chat_id)
         buttons.extend(product_buttons)
     
@@ -82,10 +91,10 @@ async def create_keyboard_keys(chat_id):
         [InlineKeyboardButton("➕ Додати категорію", callback_data="add_category"),
         InlineKeyboardButton("❌ Видалити категорію", callback_data="delete_category")],
         [InlineKeyboardButton("📊 Показати витрати за місяць", callback_data="show_expenses"),
-         InlineKeyboardButton("💳 Номер картки", callback_data="card_number")],
-        [InlineKeyboardButton("ℹ️ Довідка", callback_data="info")]
+        InlineKeyboardButton("ℹ️ Довідка", callback_data="info")]
     ]
-    return InlineKeyboardMarkup(buttons + action_buttons)
+    hide_empty_category_button = create_hide_empty_category_button(chat_id)
+    return InlineKeyboardMarkup(buttons + action_buttons + hide_empty_category_button)
 
 async def create_keyboard(chat_id, context=None):
     # Обʼєднуємо все в одну клавіатуру
